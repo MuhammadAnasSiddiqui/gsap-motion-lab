@@ -1,14 +1,31 @@
 {
-  "name": "gsap-practice-project",
+  "name": "gsap-motion-lab",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "GSAP Motion Lab — a playground for building and practicing web animations with GSAP, React, Vite, and Tailwind CSS.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "preview": "vite preview"
   },
+  "author": "Dev Team",
+  "license": "ISC",
+  "keywords": [
+    "gsap-motion-lab",
+    "gsap",
+    "animation",
+    "motion",
+    "web-animation",
+    "playground",
+    "react",
+    "vite",
+    "tailwindcss"
+  ],
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.3.3",
@@ -22,6 +39,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
+    "prettier": "^3.9.7",
     "vite": "^8.3.0"
   }
 }
