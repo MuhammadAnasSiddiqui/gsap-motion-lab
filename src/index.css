@@ -1,9 +1,62 @@
 @import "tailwindcss";
 
+/*
+ * `story:` variant — the pinned, scroll-scrubbed desktop layout.
+ * It applies from the `laptop` breakpoint (1023px) up, for visitors who haven't asked for reduced motion.
+ * LandingPage.jsx uses the exact same media query in gsap.matchMedia(), so the CSS
+ * layout and the GSAP timeline always switch on and off together.
+ */
+@custom-variant story (@media (width >= 1023px) and (prefers-reduced-motion: no-preference));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Caveat", cursive;
+
+  --color-ink: #0b1b3f;
+  --color-sun: #f3cd5a;
+  --color-sun-soft: #f3e2a6;
+  --color-royal: #0157a9;
+  --color-mist: #f0f8fe;
+
+  --color-step-cyan: #befdff;
+  --color-step-pink: #ffd7fd;
+  --color-step-cream: #fff2c9;
+  --color-step-lilac: #dbcfff;
+
+  --color-cream: #fdf9f0;
+  --color-cream-deep: #ffefca;
+  --color-ice: #e2effd;
+  --color-ice-deep: #bfdeff;
+
+  /* Breakpoints — ONE scale for the whole app, all min-width.
+     `--breakpoint-*: initial` drops Tailwind's built-in sm/md/lg/xl/2xl first.
+     Without it the defaults stay registered alongside these, so `xl:` (1280) and
+     `desktop:` (1439) both "work" and components silently flip at a different
+     width than the layout. Clearing them makes this list the only scale.
+     tablet-sm (640) and desktop-sm (1280) exist because the old default sm/xl
+     were in real use; they keep those exact thresholds under project names. */
+  --breakpoint-*: initial;
+  --breakpoint-s_phone: 319px;
+  --breakpoint-m_phone: 374px;
+  --breakpoint-phone: 429px;
+  --breakpoint-tablet-sm: 640px;
+  --breakpoint-tablet: 767px;
+  --breakpoint-laptop-sm: 900px;
+  --breakpoint-laptop: 1023px;
+  --breakpoint-desktop-sm: 1280px;
+  --breakpoint-desktop: 1439px;
+  --breakpoint-4k: 1920px;
+}
+
 :root {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #ffffff;
 }
