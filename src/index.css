@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --font-hand: Caveat, cursive;
+  --color-ink: #0b1638;
+  --color-cta: #f2d05a;
+}
+
 :root {
   font-family: Inter, system-ui, sans-serif;
   font-synthesis: none;
