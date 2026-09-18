@@ -1,10 +1,22 @@
 import React, { useRef } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import BrushWaveBackground from './BrushWaveBackground'
 import ProcessCard from './ProcessCard'
 
-gsap.registerPlugin(useGSAP)
+gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+// Card illustrations: drop step-1.png … step-4.png into src/assets/process/.
+// Missing files just fall back to the placeholder.
+const images = import.meta.glob('../assets/process/step-*.{png,webp,jpg,jpeg,avif}', {
+  eager: true,
+  import: 'default',
+})
+const stepImage = (n) =>
+  Object.entries(images).find(([path]) => path.includes(`/step-${n}.`))?.[1] ?? null
+
+const CARD_SPREAD = 48
 
 const STEPS = [
   {
@@ -13,7 +25,7 @@ const STEPS = [
       'Send us your completed manuscript, draft or book idea. Our team will review your work, understand your goals.',
     color: '#bdf9fd',
     rotation: -5,
-    image: null,
+    image: stepImage(1),
     placeholder: '📂',
   },
   {
@@ -22,7 +34,7 @@ const STEPS = [
       'Following the assessment, we will recommend a suitable publishing package covering the services',
     color: '#fbd5fa',
     rotation: 4,
-    image: null,
+    image: stepImage(2),
     placeholder: '👑',
   },
   {
@@ -31,7 +43,7 @@ const STEPS = [
       'Your dedicated team will professionally edit, design and format your book for print and digital publication.',
     color: '#fff0c4',
     rotation: -4,
-    image: null,
+    image: stepImage(3),
     placeholder: '📖',
   },
   {
@@ -40,7 +52,7 @@ const STEPS = [
       'We will publish your book and make it available and distribution networks, including Amazon, Foyles and many more.',
     color: '#d8cffc',
     rotation: 4,
-    image: null,
+    image: stepImage(4),
     placeholder: '🚀',
   },
 ]
@@ -59,40 +71,45 @@ const ProcessSection = () => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
       tl.from('.js-heading-line', { yPercent: 110, duration: 0.9, stagger: 0.12 })
         .from('.js-intro', { y: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, '-=0.6')
-        .from(
-          cards,
-          {
-            y: 160,
-            opacity: 0,
-            rotation: 0,
-            duration: 1,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
-          },
-          '-=0.4'
-        )
+
+      // When the card row scrolls into view: first half slides in from the left, second half from the right.
+      const half = cards.length / 2
+      gsap.from(cards, {
+        x: (i) => (i < half ? -1 : 1) * window.innerWidth * 0.6,
+        opacity: 0,
+        rotation: (i) => (i < half ? -1 : 1) * 12,
+        duration: 1.2,
+        ease: 'power3.out',
+        stagger: { each: 0.15, from: 'edges' },
+        scrollTrigger: {
+          trigger: '.js-process-cards',
+          start: 'top 85%',
+          once: true,
+        },
+      })
     },
     { scope: sectionRef }
   )
 
-  const liftCard = contextSafe((card) => {
-    gsap.to(card, {
-      y: -18,
-      rotation: 0,
-      scale: 1.03,
-      zIndex: 10,
-      duration: 0.45,
+  // Hovered card straightens in place; cards on either side slide away to open space.
+  // Spreading only applies to the single-row (lg) layout — in the grid it would push cards off-screen.
+  const focusCard = contextSafe((active) => {
+    const spread = window.matchMedia('(min-width: 1024px)').matches ? CARD_SPREAD : 0
+    gsap.to('.js-process-card', {
+      x: (i) => (i < active ? -spread : i > active ? spread : 0),
+      rotation: (i) => (i === active ? 0 : STEPS[i].rotation),
+      zIndex: (i) => (i === active ? 10 : i + 1),
+      duration: 0.5,
       ease: 'power3.out',
       overwrite: 'auto',
     })
   })
 
-  const dropCard = contextSafe((card, i) => {
-    gsap.to(card, {
-      y: 0,
-      rotation: STEPS[i].rotation,
-      scale: 1,
-      zIndex: i + 1,
+  const resetCards = contextSafe(() => {
+    gsap.to('.js-process-card', {
+      x: 0,
+      rotation: (i) => STEPS[i].rotation,
+      zIndex: (i) => i + 1,
       duration: 0.6,
       ease: 'power3.out',
       overwrite: 'auto',
@@ -105,7 +122,7 @@ const ProcessSection = () => {
 
       <div className="relative z-10 mx-auto max-w-[1920px] px-5 py-16 sm:px-10 lg:py-24 xl:px-[70px]">
         <header className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          <h2 className="font-display text-[clamp(2.25rem,4.3vw,5.25rem)] leading-[1.08] font-extrabold tracking-[-0.04em] text-ink">
+          <h2 className="font-heading text-[clamp(2.25rem,4.3vw,5.25rem)] leading-[1.08] font-extrabold tracking-[-0.04em] text-ink">
             <span className="block overflow-hidden pb-[0.16em] -mb-[0.12em]">
               <span className="js-heading-line block">Publishing doesn’t have</span>
             </span>
@@ -135,7 +152,7 @@ const ProcessSection = () => {
           </div>
         </header>
 
-        <div className="mt-16 grid justify-items-center gap-10 sm:grid-cols-2 lg:mt-20 lg:flex lg:justify-center lg:gap-0">
+        <div className="js-process-cards mt-16 grid justify-items-center gap-10 sm:grid-cols-2 lg:mt-20 lg:flex lg:justify-center lg:gap-0">
           {STEPS.map((step, i) => (
             <div key={step.title} className="w-full max-w-[360px] lg:-mx-1.5 lg:flex-1">
               <ProcessCard
@@ -144,8 +161,8 @@ const ProcessSection = () => {
                 cardRef={(el) => {
                   cardRefs.current[i] = el
                 }}
-                onEnter={(e) => liftCard(e.currentTarget)}
-                onLeave={(e) => dropCard(e.currentTarget, i)}
+                onEnter={() => focusCard(i)}
+                onLeave={resetCards}
               />
             </div>
           ))}

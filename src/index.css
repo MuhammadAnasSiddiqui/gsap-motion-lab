@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/* Licensed font: put Merculia.woff2 / Merculia.otf in public/fonts/.
+   Until the files are there, headings fall back to Plus Jakarta Sans. */
+@font-face {
+  font-family: "Merculia";
+  src:
+    url("/fonts/Merculia.woff2") format("woff2"),
+    url("/fonts/Merculia.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
+  --font-heading: "Merculia", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
   --font-hand: Caveat, cursive;
   --color-ink: #0b1638;
