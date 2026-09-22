@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import BrushWaveBackground from './BrushWaveBackground'
 import ProcessCard from './ProcessCard'
+import StatsStrip from './StatsStrip'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -167,6 +168,8 @@ const ProcessSection = () => {
             </div>
           ))}
         </div>
+
+       
       </div>
     </section>
   )
