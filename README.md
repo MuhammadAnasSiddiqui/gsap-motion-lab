@@ -24,7 +24,7 @@ The starter uses @gsap/react for animation cleanup and respects reduced-motion p
 
 ## Cambridge Book Publishing homepage
 
-The Figma "Website" frame (1920 wide, ~12,600px tall) is built section by section under `src/components/sections/`, composed in `src/App.jsx`. Sizes scale from the comp via `--u` (one design pixel, see `src/index.css`), which also defines the type scale (`t-h2`, `t-body`, ...) and the rounded `panel` utility.
+Served at `/camblp` (`src/pages/CambridgeHome.jsx`); `/` is the lab index (`src/pages/LabIndex.jsx`), routed in `src/App.jsx` with react-router-dom. The Figma "Website" frame (1920 wide, ~12,600px tall) is built section by section under `src/components/sections/`. Sizes scale from the comp via `--u` (one design pixel, see `src/index.css`), which also defines the type scale (`t-h2`, `t-body`, ...) and the rounded `panel` utility.
 
 Motion lives in each section (GSAP + ScrollTrigger from `src/lib/gsap.js`; generic reveals via `data-reveal` in `src/lib/useReveal.js`). Highlights: hero intro + pointer parallax, count-up stats, step cards settling onto their tilts, a working 4-step quiz, a scroll-scrubbed book tilt, the pinned gallery morph (fan to grid), pin drops, marquee ribbons, genre wipes, a scroll-tweened testimonial rail and an animated FAQ accordion. Everything respects `prefers-reduced-motion`.
 
