@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -6,7 +6,8 @@ import './BookShowcase.css'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-// Learning artwork only. Add a local image import as `src` to replace a cover.
+// Placeholder artwork. Add a local image import as `src` to replace a cover.
+// Pending: real cover exports from Figma.
 const sampleBooks = [
   { title: 'The Wild Atlas', author: 'Mira Lane', color: '#153f38', accent: '#bdd69c' },
   { title: 'Half of a Sun', author: 'Noah Reed', color: '#69412b', accent: '#eed4a0' },
@@ -27,12 +28,6 @@ const benefits = [
 export default function BookShowcase({ books = sampleBooks }) {
   const root = useRef(null)
   const stage = useRef(null)
-  const timeline = useRef(null)
-  const progress = useRef(null)
-  const readout = useRef(null)
-  const [mode, setMode] = useState('timeline')
-  const [playing, setPlaying] = useState(false)
-  const [reduceMotion, setReduceMotion] = useState(false)
 
   useGSAP(() => {
     const media = gsap.matchMedia()
@@ -47,32 +42,19 @@ export default function BookShowcase({ books = sampleBooks }) {
       const select = gsap.utils.selector(root)
       const cards = select('[data-book]')
       const copy = select('[data-copy]')
-      // Always start from the CSS end layout, including after a mode switch.
+      // Always start from the CSS end layout, including after a rebuild.
       gsap.set([...cards, ...copy, ...select('[data-panel], [data-intro]')], {
         clearProps: 'transform,opacity,visibility',
       })
-      setReduceMotion(reduced)
-      setPlaying(false)
 
-      if (reduced) {
-        // The unanimated CSS layout is already the complete, readable end state.
-        progress.current.value = '100'
-        readout.current.textContent = '100%'
-        return
-      }
+      // The unanimated CSS layout is already the complete, readable end state.
+      if (reduced) return
 
-      // 2. A paused timeline lets Play, the slider OR ScrollTrigger drive time.
+      // 2. A paused timeline lets ScrollTrigger drive time.
       const tl = gsap.timeline({
         paused: true,
         defaults: { duration: 1.8, ease: 'power2.inOut' },
-        onUpdate: () => {
-          const value = Math.round(tl.progress() * 100)
-          progress.current.value = String(value)
-          readout.current.textContent = `${value}%`
-        },
-        onComplete: () => setPlaying(false),
       })
-      timeline.current = tl
 
       // 3. Cards live in their final CSS grid positions. These functions calculate
       //    the transform needed to move each one BACK to the opening fan.
@@ -97,81 +79,35 @@ export default function BookShowcase({ books = sampleBooks }) {
         .fromTo(copy, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.85, stagger: 0.09 }, 'reveal+=0.5')
 
       // 5. Index 6 exits/fades in the SAME card tween above. One tween owns each
-      //    property, so restart and backward seeking restore the fan reliably.
+      //    property, so backward seeking restores the fan reliably.
 
       tl.progress(0)
-      if (mode === 'scroll') {
-        // Our implementation choice: pin the stage and map scroll to timeline.
-        // The recording shows the transition, but not its original Figma trigger.
-        ScrollTrigger.create({
-          trigger: stage.current,
-          start: 'top 16px',
-          end: () => `+=${window.innerHeight * 1.5}`,
-          pin: true,
-          scrub: 0.6,
-          animation: tl,
-          invalidateOnRefresh: true,
-        })
-      }
 
-      // Keep the current visual progress when resizing in manual mode.
-      let resizeTimer
-      const resize = () => {
-        if (mode === 'scroll') return // ScrollTrigger refreshes its own geometry.
-        clearTimeout(resizeTimer)
-        resizeTimer = setTimeout(() => {
-          const current = tl.progress()
-          tl.invalidate().progress(current)
-        }, 120)
-      }
-      window.addEventListener('resize', resize)
-      return () => {
-        clearTimeout(resizeTimer)
-        window.removeEventListener('resize', resize)
-        timeline.current = null
-      }
+      // 6. Pin the stage and map scroll to timeline. Exact trigger points are
+      //    still our own choice; confirm them against the Figma prototype.
+      ScrollTrigger.create({
+        trigger: stage.current,
+        start: 'top 16px',
+        end: () => `+=${window.innerHeight * 1.5}`,
+        pin: true,
+        scrub: 0.6,
+        animation: tl,
+        invalidateOnRefresh: true,
+      })
     }, root)
 
-    // 6. Removes the timeline, pin spacer and listeners on unmount/mode change.
+    // 7. Removes the timeline, pin spacer and ScrollTrigger on unmount.
     return () => media.revert()
-  }, { scope: root, dependencies: [mode, books], revertOnUpdate: true })
-
-  const play = () => {
-    if (!timeline.current) return
-    if (playing) {
-      timeline.current.pause()
-      setPlaying(false)
-    } else {
-      if (timeline.current.progress() === 1) timeline.current.restart()
-      else timeline.current.play()
-      setPlaying(true)
-    }
-  }
-
-  const replay = () => {
-    timeline.current?.restart()
-    setPlaying(true)
-  }
+  }, { scope: root, dependencies: [books], revertOnUpdate: true })
 
   return (
-    <main ref={root} className="showcase-page">
-      <header className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-6 py-6 sm:px-10">
-        <a className="brand" href="#showcase">Cambridge<span>Publishing / motion study</span></a>
-        <div className="mode-switch" role="group" aria-label="Animation control mode">
-          {['timeline', 'scroll'].map((value) => (
-            <button key={value} type="button" aria-pressed={mode === value} onClick={() => setMode(value)}>
-              {value === 'timeline' ? 'Timeline demo' : 'Scroll demo'}
-            </button>
-          ))}
-        </div>
-      </header>
-
+    <section ref={root} className="showcase-page">
       <div className="mx-auto max-w-[1440px] px-3 sm:px-6">
-        <section id="showcase" ref={stage} className="book-stage" aria-label="From a collection of stories to your publishing partner">
+        <div id="showcase" ref={stage} className="book-stage" aria-label="From a collection of stories to your publishing partner">
           <div data-panel className="fan-panel" aria-hidden="true"><div className="panel-orbit" /></div>
           <div data-intro className="fan-intro">
             <p className="eyebrow">A shelf full of possibilities</p>
-            <h1>Every story deserves<br className="sm:hidden" /> its place.</h1>
+            <h2>Every story deserves<br className="sm:hidden" /> its place.</h2>
             <p>Ideas, imagined and published. Yours could be next.</p>
           </div>
 
@@ -182,7 +118,8 @@ export default function BookShowcase({ books = sampleBooks }) {
                 <div key={title} data-copy><dt>{title}</dt><dd>{description}</dd></div>
               ))}
             </dl>
-            <a data-copy href="#next-step" className="explore-link">See what we can do <span aria-hidden="true">&rarr;</span></a>
+            {/* Pending: the CTA destination is not yet confirmed from Figma. */}
+            <a data-copy href="#" className="explore-link">See what we can do <span aria-hidden="true">&rarr;</span></a>
           </div>
 
           <ul className="book-layer" aria-label="Sample book collection">
@@ -201,32 +138,8 @@ export default function BookShowcase({ books = sampleBooks }) {
               </li>
             ))}
           </ul>
-          <span className="stage-caption">{books === sampleBooks ? 'Study edition · sample cover artwork' : 'Publishing collection'}</span>
-          <span className="stage-number" aria-hidden="true">01 — 07</span>
-        </section>
-
-        <div className="playback-bar">
-          <div className="flex items-center gap-2">
-            <button className="play-button" type="button" onClick={play} disabled={reduceMotion || mode === 'scroll'}>{playing ? 'Pause' : 'Play transition'}</button>
-            <button className="replay-button" type="button" onClick={replay} disabled={reduceMotion || mode === 'scroll'}>Replay</button>
-          </div>
-          <label className="progress-control">Progress
-            <input ref={progress} type="range" min="0" max="100" defaultValue="0" disabled={reduceMotion || mode === 'scroll'} onChange={(event) => {
-              timeline.current?.pause().progress(Number(event.target.value) / 100)
-              setPlaying(false)
-            }} />
-            <output ref={readout}>0%</output>
-          </label>
-          <p className="playback-hint" role="status">{reduceMotion ? 'Reduced motion: final layout shown.' : mode === 'scroll' ? 'Scroll down to transform. Scroll up to reverse.' : 'Press play, or drag progress to explore the transition.'}</p>
         </div>
       </div>
-
-      <section id="next-step" className="next-step mx-auto max-w-[1440px] px-6 py-20 sm:px-10">
-        <p className="eyebrow">Your next chapter</p>
-        <h2>From the first idea<br />to the finished book.</h2>
-        <p>Author-first support, thoughtful design, and a story that stays yours.</p>
-        <a href="#showcase">Back to the collection <span aria-hidden="true">&uarr;</span></a>
-      </section>
-    </main>
+    </section>
   )
 }
