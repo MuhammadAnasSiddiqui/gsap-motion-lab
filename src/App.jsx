@@ -1,5 +1,11 @@
-import BookShowcase from './components/BookShowcase'
+import Home from "./views/Home";
 
-export default function App() {
-  return <BookShowcase />
-}
+const App = () => {
+  return (
+    <div>
+      <Home />
+    </div>
+  );
+};
+
+export default App;
