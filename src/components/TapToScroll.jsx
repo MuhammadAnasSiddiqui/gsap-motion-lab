@@ -4,7 +4,8 @@ import { Observer } from 'gsap/Observer'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
-import { canvasScale, MIN_INNER_STEP, SECTIONS } from '../lib/design'
+import { exitRange } from '../lib/blurOnExit'
+import { canvasScale, DESIGN_WIDTH, MIN_INNER_STEP, SECTIONS } from '../lib/design'
 
 gsap.registerPlugin(useGSAP, Observer, ScrollToPlugin, ScrollTrigger)
 
@@ -13,9 +14,19 @@ gsap.registerPlugin(useGSAP, Observer, ScrollToPlugin, ScrollTrigger)
 // animations play out over exactly this window.
 const STEP_DURATION = 1.2
 
+// The pill, straight from Figma: 44x185 against the right edge, centred down the
+// screen, white at 60%, the label reading bottom to top with an arrow below it.
+// 24px of padding at each end, 8px between label and arrow.
+const PILL = { width: 44, height: 185, radius: 80, padding: 24, gap: 8, label: 107, arrow: 22 }
+
+// The back control: a 60px disc that parks near the bottom left while the hero
+// is on screen, then rides up into the logo's slot for every section after it.
+const BACK = { size: 60, left: 70, top: 33, bottomGap: 94 }
+
 const TapToScroll = () => {
   const animating = useRef(false)
   const stops = useRef([])
+  const backRef = useRef(null)
 
   // Inside the canvas a section is walked through before the next one is
   // reached: its top, then even steps until its bottom sits on the screen edge.
@@ -112,6 +123,25 @@ const TapToScroll = () => {
 
     window.addEventListener('keydown', onKey)
 
+    // While the hero is up the disc sits near the bottom of the screen; it
+    // travels into the header slot over the same hand-over the hero zooms on.
+    const hero = document.querySelector('[data-hero]')
+    if (hero) {
+      const { start, end } = exitRange(hero)
+      const parked = () =>
+        window.innerHeight / canvasScale() - BACK.bottomGap - BACK.size - BACK.top
+
+      gsap.fromTo(
+        backRef.current,
+        { y: parked },
+        {
+          y: 0,
+          ease: 'none',
+          scrollTrigger: { trigger: hero, start, end, scrub: true, invalidateOnRefresh: true },
+        }
+      )
+    }
+
     return () => {
       ScrollTrigger.removeEventListener('refresh', measure)
       window.removeEventListener('keydown', onKey)
@@ -119,29 +149,81 @@ const TapToScroll = () => {
   })
 
   return (
-    <button
-      type="button"
-      onClick={() => step(1)}
-      className="group fixed top-1/2 right-4 z-50 hidden -translate-y-1/2 cursor-pointer flex-col items-center gap-4 text-ink opacity-60 transition-opacity hover:opacity-100 sm:right-8 sm:flex"
-    >
-      <span className="font-display text-sm font-semibold tracking-[0.18em] uppercase [writing-mode:vertical-rl]">
-        Tap to Scroll
-      </span>
-      <span className="flex size-11 items-center justify-center rounded-full bg-white/80 shadow-[0_10px_30px_-18px_rgba(11,22,56,0.8)] transition-transform duration-300 group-hover:translate-y-1">
-        <svg
-          viewBox="0 0 24 24"
-          className="size-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+    <>
+      <div
+        className="pointer-events-none fixed top-0 left-0 z-50 origin-top-left"
+        style={{ width: DESIGN_WIDTH, transform: 'scale(var(--design-scale, 1))' }}
+      >
+        <button
+          ref={backRef}
+          type="button"
+          aria-label="Back"
+          onClick={() => step(-1)}
+          className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-ink transition-transform duration-300 hover:-translate-x-1"
+          style={{ left: BACK.left, top: BACK.top, width: BACK.size, height: BACK.size }}
         >
-          <path d="M12 5v14M6 13l6 6 6-6" />
-        </svg>
-      </span>
-    </button>
+          <svg
+            viewBox="0 0 30 30"
+            style={{ width: 30, height: 30 }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M25 15H5M12 8l-7 7 7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        className="pointer-events-none fixed right-0 z-50"
+        style={{
+          top: '50%',
+          transform: 'translateY(-50%) scale(var(--design-scale, 1))',
+          transformOrigin: 'right center',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => step(1)}
+          className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100"
+          style={{
+            width: PILL.width,
+            height: PILL.height,
+            borderRadius: PILL.radius,
+            paddingTop: PILL.padding,
+            paddingBottom: PILL.padding,
+            gap: PILL.gap,
+          }}
+        >
+          <span
+            style={{
+              writingMode: 'vertical-rl',
+              transform: 'rotate(180deg)',
+              height: PILL.label,
+              fontSize: 20,
+              lineHeight: '28px',
+            }}
+          >
+            Tap to Scroll
+          </span>
+          <svg
+            viewBox="0 0 22 22"
+            style={{ width: PILL.arrow, height: PILL.arrow }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M11 3.5v15M5 12.5l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+    </>
   )
 }
 

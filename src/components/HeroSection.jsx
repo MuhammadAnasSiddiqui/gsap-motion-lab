@@ -3,9 +3,10 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import backdrop from '../assets/hero/backdrop.svg'
+import wash from '../assets/hero/wash.svg'
 import cloud from '../assets/hero/cloud.png'
-import book from '../assets/hero/floating-books.png'
-import { blurOnExit } from '../lib/blurOnExit'
+import bookVideo from '../assets/hero/hero-video.mp4'
+import { blurOnExit, exitRange } from '../lib/blurOnExit'
 import { HERO } from '../lib/design'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
@@ -24,13 +25,24 @@ const FROM_FIRST_FRAME = {
 const EXIT_SCALE = 1.87
 const EXIT_LIFT = 0.53
 
+// Figma masks a square 689x689 artwork down to a 492x628 cut-out. This video
+// carries no background of its own, so it plays at the full square size in the
+// exact place that artwork sat — the book lands where it always did, uncropped.
+const BOOK = { x: 1156, y: 237, size: 689 }
+
 const HeroSection = () => {
   const sectionRef = useRef(null)
   const stageRef = useRef(null)
+  const videoRef = useRef(null)
 
   useGSAP(
     () => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Leave the poster frame up rather than looping a video at someone who
+        // asked for less movement.
+        videoRef.current?.pause()
+        return
+      }
 
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
       tl.from('.js-hero-line', { yPercent: 115, duration: 1, stagger: 0.12 })
@@ -46,7 +58,7 @@ const HeroSection = () => {
         .from('.js-hero-cloud', { ...FROM_FIRST_FRAME.cloud, duration: 2, ease: 'power2.in' }, 0)
         .from('.js-hero-book', { ...FROM_FIRST_FRAME.book, duration: 2, ease: 'power2.in' }, 0)
 
-      // The float lives on the inner image so it never fights the settle above.
+      // The float lives on the inner wrapper so it never fights the settle above.
       gsap.to('.js-hero-float', {
         y: 18,
         duration: 3.2,
@@ -58,14 +70,16 @@ const HeroSection = () => {
 
       blurOnExit(sectionRef.current)
 
+      // Only over the hand-over range: scrolling inside the hero leaves it alone.
+      const { start, end } = exitRange(sectionRef.current)
       gsap.to(stageRef.current, {
         scale: EXIT_SCALE,
         y: -EXIT_LIFT * HERO.height,
         ease: 'none',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top top',
-          end: 'bottom top',
+          start,
+          end,
           scrub: true,
           invalidateOnRefresh: true,
         },
@@ -77,31 +91,53 @@ const HeroSection = () => {
   return (
     <section
       ref={sectionRef}
+      data-hero
       className="relative overflow-hidden bg-[#d2e6fc]"
-      style={{ height: HERO.height }}
+      style={{ height: HERO.height, borderBottomLeftRadius: 150, borderBottomRightRadius: 150 }}
     >
       <div ref={stageRef} className="absolute inset-0 will-change-transform">
-        {/* The export carries ~97px of bleed on each side of the Figma box. */}
+        {/* A second wash of the same gradient shape sits under the backdrop. */}
+        <img
+          src={wash}
+          alt=""
+          aria-hidden="true"
+          className="absolute max-w-none select-none"
+          style={{ left: -170, top: -88, width: 753, height: 578 }}
+        />
         <img
           src={backdrop}
           alt=""
           aria-hidden="true"
           className="js-hero-backdrop absolute max-w-none select-none"
-          style={{ left: -271, top: -435, width: 2795 }}
+          style={{ left: -173, top: -337, width: 2600, height: 1691 }}
         />
         <img
           src={cloud}
           alt=""
           aria-hidden="true"
           className="js-hero-cloud absolute max-w-none select-none"
-          style={{ left: -100, top: 612, width: 875 }}
+          style={{ left: -100, top: 612, width: 875, height: 583 }}
         />
-        <div className="js-hero-book absolute" style={{ left: 1255, top: 266, width: 492 }}>
-          <img src={book} alt="" aria-hidden="true" className="js-hero-float w-full select-none" />
+
+        <div
+          className="js-hero-book absolute"
+          style={{ left: BOOK.x, top: BOOK.y, width: BOOK.size, height: BOOK.size }}
+        >
+          <video
+            ref={videoRef}
+            src={bookVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            className="js-hero-float size-full object-contain"
+          />
         </div>
 
         <h1
-          className="absolute font-heading font-extrabold text-[#081a3a]"
+          className="absolute font-heading font-extrabold text-ink capitalize"
           style={{ left: 70, top: 262, width: 1070, fontSize: 120, lineHeight: '120px' }}
         >
           <span className="block overflow-hidden" style={{ height: 120 }}>
@@ -122,11 +158,11 @@ const HeroSection = () => {
 
         <a
           href="#start"
-          className="js-hero-fade group absolute flex items-center rounded-full bg-[#f3cd5a] transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
+          className="js-hero-fade group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
           style={{ left: 70, top: 698, width: 393, height: 80 }}
         >
           <span
-            className="absolute font-heading font-semibold text-[#081a3a]"
+            className="absolute font-heading font-semibold text-ink"
             style={{ left: 24, fontSize: 23, lineHeight: '28px' }}
           >
             Start Your Publishing Journey

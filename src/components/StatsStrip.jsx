@@ -152,7 +152,7 @@ const StatsStrip = () => {
               />
 
               <p
-                className="js-stat-number absolute font-heading font-bold text-[#081a3a]"
+                className="js-stat-number absolute font-heading font-bold text-ink"
                 style={{ left: CARD.padX, top: CARD.numberY, fontSize: 90, lineHeight: '99px' }}
                 data-count={value ?? ''}
                 data-suffix={suffix}
@@ -162,7 +162,7 @@ const StatsStrip = () => {
               </p>
 
               <p
-                className="absolute font-heading font-semibold text-[#081a3a]"
+                className="absolute font-heading font-semibold text-ink"
                 style={{ left: CARD.padX, top: CARD.labelY, fontSize: 28, lineHeight: '28px' }}
               >
                 {label}

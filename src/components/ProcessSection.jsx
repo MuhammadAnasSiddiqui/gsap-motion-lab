@@ -22,10 +22,10 @@ const stepImage = (n) =>
 // as the section scrolls up.
 const SPREAD = 6.92
 
-// Hover: the card under the pointer straightens and grows, its neighbours step
-// aside. Figma animates this with its BOUNCY spring over ~1.2s.
+// Hover: the card under the pointer straightens and its neighbours step aside.
+// Figma animates this with its BOUNCY spring over ~1.2s. No scaling — the cards
+// keep their size.
 const CARD_SPREAD = 48
-const CARD_GROW = 1.12
 const HOVER = { duration: 0.9, ease: 'back.out(1.6)' }
 
 // Card centres inside the 1817-wide row, straight from the frame.
@@ -97,12 +97,11 @@ const ProcessSection = () => {
     { scope: sectionRef }
   )
 
-  // Hovered card straightens and grows; cards on either side slide away. The
+  // Hovered card straightens in place; cards on either side slide away. The
   // gather runs on the outer slot, so the two never fight over one transform.
   const focusCard = contextSafe((active) => {
     gsap.to('.js-process-card', {
       x: (i) => (i < active ? -CARD_SPREAD : i > active ? CARD_SPREAD : 0),
-      scale: (i) => (i === active ? CARD_GROW : 1),
       rotation: (i) => (i === active ? 0 : STEPS[i].rotation),
       zIndex: (i) => (i === active ? 10 : i + 1),
       ...HOVER,
@@ -113,7 +112,6 @@ const ProcessSection = () => {
   const resetCards = contextSafe(() => {
     gsap.to('.js-process-card', {
       x: 0,
-      scale: 1,
       rotation: (i) => STEPS[i].rotation,
       zIndex: (i) => i + 1,
       ...HOVER,
@@ -133,7 +131,7 @@ const ProcessSection = () => {
         </div>
 
         <h2
-          className="absolute font-heading font-bold text-[#081a3a]"
+          className="absolute font-heading font-bold text-ink"
           style={{ left: 130, top: 109, width: 1028, fontSize: 90, lineHeight: '99px' }}
         >
           <span className="block overflow-hidden" style={{ height: 99 }}>
@@ -145,7 +143,7 @@ const ProcessSection = () => {
         </h2>
 
         <p
-          className="js-intro absolute font-heading font-semibold text-[#081a3a]"
+          className="js-intro absolute font-heading font-semibold text-ink"
           style={{ left: 1238, top: 128, width: 512, fontSize: 28, lineHeight: '28px' }}
         >
           We take care of the process.
@@ -155,11 +153,11 @@ const ProcessSection = () => {
 
         <a
           href="#start"
-          className="js-intro group absolute flex items-center rounded-full bg-[#f3cd5a] transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
+          className="js-intro group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
           style={{ left: 1285, top: 208, width: 465, height: 80 }}
         >
           <span
-            className="absolute font-heading font-semibold text-[#081a3a]"
+            className="absolute font-heading font-semibold text-ink"
             style={{ left: 24, fontSize: 28, lineHeight: '28px' }}
           >
             Start Your Publishing Journey
