@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* Licensed font: put Merculia.woff2 / Merculia.otf in public/fonts/.
-   Until the files are there, headings fall back to Plus Jakarta Sans. */
+/* The design uses four licensed fonts. Drop the files into public/fonts/ with
+   these names and every size/position below is already correct — until then the
+   fallbacks render at different metrics, so text will not be pixel-exact.
+     Merculia          headings, buttons, stat numbers  (500/600/700/800)
+     Inter Display     body copy                        (400)
+     Rentan Yena       the "Step#1" handwriting         (400)
+     Bringbold Nineties  header nav                     (400) */
 @font-face {
   font-family: "Merculia";
   src:
@@ -12,16 +17,42 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Inter Display";
+  src: url("/fonts/InterDisplay.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rentan Yena";
+  src: url("/fonts/RentanYena.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bringbold Nineties";
+  src: url("/fonts/BringboldNineties.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --font-heading: "Merculia", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --font-body: "Inter Display", Inter, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  --font-hand: Caveat, cursive;
-  --color-ink: #0b1638;
-  --color-cta: #f2d05a;
+  --font-hand: "Rentan Yena", Caveat, cursive;
+  --font-nav: "Bringbold Nineties", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --color-ink: #081a3a;
+  --color-cta: #f3cd5a;
 }
 
 :root {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

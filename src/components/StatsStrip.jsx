@@ -2,6 +2,9 @@ import React, { useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { blurOnExit } from '../lib/blurOnExit'
+import { convergeCards } from '../lib/convergeCards'
+import { STATS as STATS_BOX } from '../lib/design'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -14,16 +17,24 @@ const icons = import.meta.glob('../assets/stats/stat-*.{png,webp,svg,jpg,jpeg,av
 const statIcon = (n) =>
   Object.entries(icons).find(([path]) => path.includes(`/stat-${n}.`))?.[1] ?? null
 
-// Two palettes alternating across the row: warm (cream/amber) and cool (ice/blue).
+// Colours taken from the Figma cards: `base` is the light side the content sits
+// on, `accent` the painted side.
 const PALETTES = {
-  warm: { base: '#FEF9F0', soft: '#FCEAC2', strong: '#FBDC91' },
-  cool: { base: '#EAF2FD', soft: '#CCE0FB', strong: '#A9CBF8' },
+  warm: { base: '#FDF9F0', accent: '#FFEFCA' },
+  cool: { base: '#E2EFFD', accent: '#BFDEFF' },
 }
 
-// Vertical brush-wave edges, drawn in a 0–100 box and stretched to the card
-// (preserveAspectRatio="none"), so the split keeps its shape at any size.
-const WAVE_SOFT = 'M55 0C42 16 64 31 48 49c-15 17 14 28 5 51h47V0H55Z'
-const WAVE_STRONG = 'M76 0C64 15 85 30 70 48c-15 18 12 30 4 52h26V0H76Z'
+// The light half, drawn in a 0-100 box and stretched to the card
+// (preserveAspectRatio="none"). Still a hand-drawn stand-in for Figma's painted
+// edge — the real vector needs a geometry export.
+const WAVE = 'M0 0H52C56 7 59 14 57 21 55 28 51 34 50 43c-1 8 5 12 12 13 7 1 9 7 8 14-1 8-4 15-4 22 0 5 3 7 6 10H0Z'
+
+// Figma: the cards start 5.21x further from the row centre and gather in.
+const SPREAD = 5.21
+
+// Card box and its internal rhythm, straight from the frame.
+const CARD = { width: 446, height: 367, radius: 36, padX: 32, iconY: 54, numberY: 170, labelY: 285 }
+const PITCH = 478
 
 const STATS = [
   { value: 500, suffix: '+', label: 'Authors supported', tone: 'warm', icon: statIcon(1) },
@@ -34,6 +45,7 @@ const STATS = [
 
 const StatsStrip = () => {
   const sectionRef = useRef(null)
+  const rowRef = useRef(null)
 
   useGSAP(
     () => {
@@ -48,16 +60,29 @@ const StatsStrip = () => {
         return
       }
 
-      gsap.from(cards, {
-        y: 60,
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: 0.12,
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', once: true },
+      // Ends on 'bottom bottom' — the exact scroll position the strip rests at
+      // — so the cards are fully gathered by the time it stops.
+      convergeCards(cards, {
+        spread: SPREAD,
+        trigger: sectionRef.current,
+        start: 'top bottom',
+        end: 'bottom bottom',
       })
 
-      // Numbers tick up once the row is in view; text-only stats just fade in above.
+      // The strip rests on the bottom edge of the screen, so the section above it
+      // stays in view. It is done with, so it drops out of focus as the strip
+      // settles — blurred, not hidden.
+      const above = sectionRef.current.previousElementSibling
+      if (above) {
+        blurOnExit(above, {
+          amount: 14,
+          trigger: sectionRef.current,
+          start: 'top bottom',
+          end: 'bottom bottom',
+        })
+      }
+
+      // Numbers tick up once the row is in view; the text-only stat stays put.
       gsap.utils.toArray('.js-stat-number').forEach((el, i) => {
         const target = Number(el.dataset.count)
         if (!target) return
@@ -76,7 +101,7 @@ const StatsStrip = () => {
           onUpdate: () => {
             el.textContent = Math.round(counter.n).toLocaleString('en-US') + el.dataset.suffix
           },
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', once: true },
+          scrollTrigger: { trigger: rowRef.current, start: 'top 80%', once: true },
         })
       })
     },
@@ -84,51 +109,69 @@ const StatsStrip = () => {
   )
 
   return (
-    <div
+    // Clipped because the cards start far outside the row on their way in, and
+    // pulled up because Figma overlaps it into the section above.
+    <section
       ref={sectionRef}
-      className="js-stats-strip grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7 relative z-10 mx-auto max-w-[1920px] px-5 py-16 sm:px-10 lg:py-6"
+      className="js-stats-strip relative overflow-x-clip"
+      style={{ height: STATS_BOX.height, marginTop: -STATS_BOX.overlap }}
     >
-      {STATS.map(({ value, suffix = '', text, label, tone, icon }) => {
-        const palette = PALETTES[tone]
-        const final = text ?? value.toLocaleString('en-US') + suffix
+      <div ref={rowRef} className="absolute" style={{ left: 20, top: 20, width: 1880, height: CARD.height }}>
+        {STATS.map(({ value, suffix = '', text, label, tone, icon }, i) => {
+          const palette = PALETTES[tone]
+          const final = text ?? value.toLocaleString('en-US') + suffix
 
-        return (
-          <article
-            key={label}
-            className="js-stat-card group relative isolate overflow-hidden rounded-[32px] px-8 py-9 shadow-[0_24px_60px_-40px_rgba(11,22,56,0.45)] transition-transform duration-500 will-change-transform hover:-translate-y-2"
-            style={{ backgroundColor: palette.base }}
-          >
-            <svg
-              className="absolute inset-0 -z-10 size-full"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
+          return (
+            <article
+              key={label}
+              className="js-stat-card absolute isolate overflow-hidden will-change-transform"
+              style={{
+                left: i * PITCH,
+                top: 0,
+                width: CARD.width,
+                height: CARD.height,
+                borderRadius: CARD.radius,
+                backgroundColor: palette.accent,
+              }}
             >
-              <path d={WAVE_SOFT} fill={palette.soft} />
-              <path d={WAVE_STRONG} fill={palette.strong} />
-            </svg>
+              <svg
+                className="absolute inset-0 -z-10 size-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path d={WAVE} fill={palette.base} />
+              </svg>
 
-            <img
-              src={icon}
-              alt=""
-              loading="lazy"
-              className="size-14 object-contain object-left sm:size-16"
-            />
+              <img
+                src={icon}
+                alt=""
+                loading="lazy"
+                className="absolute object-contain"
+                style={{ left: CARD.padX, top: CARD.iconY, width: 100, height: 100 }}
+              />
 
-            <p
-              className="js-stat-number mt-8 font-heading text-[clamp(2.75rem,3.4vw,4rem)] leading-none font-extrabold tracking-[-0.04em] text-ink"
-              data-count={value ?? ''}
-              data-suffix={suffix}
-              data-final={final}
-            >
-              {final}
-            </p>
+              <p
+                className="js-stat-number absolute font-heading font-bold text-[#081a3a]"
+                style={{ left: CARD.padX, top: CARD.numberY, fontSize: 90, lineHeight: '99px' }}
+                data-count={value ?? ''}
+                data-suffix={suffix}
+                data-final={final}
+              >
+                {final}
+              </p>
 
-            <p className="mt-4 font-display text-lg font-bold text-ink sm:text-xl">{label}</p>
-          </article>
-        )
-      })}
-    </div>
+              <p
+                className="absolute font-heading font-semibold text-[#081a3a]"
+                style={{ left: CARD.padX, top: CARD.labelY, fontSize: 28, lineHeight: '28px' }}
+              >
+                {label}
+              </p>
+            </article>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 
