@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+/* Optional licensed fonts; the theme fallbacks apply until files are supplied. */
+@font-face {
+  font-family: "Merculia";
+  src:
+    url("/fonts/Merculia.woff2") format("woff2"),
+    url("/fonts/Merculia.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("/fonts/InterDisplay.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rentan Yena";
+  src: url("/fonts/RentanYena.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bringbold Nineties";
+  src: url("/fonts/BringboldNineties.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   /* Cambridge Book Publishing — tokens from the Figma comp */
   --color-navy: #081a3a;
@@ -14,6 +49,7 @@
   --color-cream: #fdf9f0;
   --color-frost: #e2effd;
   --color-border: #cbdce9;
+  --color-cta: #f3cd5a;
 
   /* Merculia / Inter Display are commercial faces; the Google Fonts fallbacks
      are the closest free matches (Gabarito was measured nearest in width). */
@@ -22,6 +58,9 @@
   --font-script: "Springlake", "Rentan Yena", "Caveat", cursive;
   --font-lexend: "Lexend", "Inter", system-ui, sans-serif;
   --font-nunito: "Nunito", "Inter", system-ui, sans-serif;
+  --font-heading: "Merculia", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --font-hand: "Rentan Yena", Caveat, cursive;
+  --font-nav: "Bringbold Nineties", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
 }
 
 :root {

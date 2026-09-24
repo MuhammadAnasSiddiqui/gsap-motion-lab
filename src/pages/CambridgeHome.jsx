@@ -23,8 +23,8 @@ function CambridgeHome() {
   return (
     <main ref={main}>
       <Hero />
-      <Stats />
-      <Steps />
+      {/* <Stats />
+      <Steps /> */}
       <PublishForm />
       <BookSpin />
       <Gallery />

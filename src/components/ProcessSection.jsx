@@ -3,7 +3,9 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import BrushWaveBackground from './BrushWaveBackground'
-import ProcessCard from './ProcessCard'
+import ProcessCard, { CARD_HEIGHT, CARD_WIDTH } from './ProcessCard'
+import { convergeCards } from '../lib/convergeCards'
+import { PROCESS } from '../lib/design'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -16,15 +18,25 @@ const images = import.meta.glob('../assets/process/step-*.{png,webp,jpg,jpeg,avi
 const stepImage = (n) =>
   Object.entries(images).find(([path]) => path.includes(`/step-${n}.`))?.[1] ?? null
 
-const CARD_SPREAD = 48
+// Figma: the step cards start 6.92x further from the row centre and gather in
+// as the section scrolls up.
+const SPREAD = 6.92
 
+// Hover: the card under the pointer straightens and its neighbours step aside.
+// Figma animates this with its BOUNCY spring over ~1.2s. No scaling — the cards
+// keep their size.
+const CARD_SPREAD = 48
+const HOVER = { duration: 0.9, ease: 'back.out(1.6)' }
+
+// Card centres inside the 1817-wide row, straight from the frame.
 const STEPS = [
   {
     title: 'Submit Your Manuscript',
     description:
       'Send us your completed manuscript, draft or book idea. Our team will review your work, understand your goals.',
-    color: '#bdf9fd',
+    color: '#befdff',
     rotation: -5,
+    centre: { x: 372.5, y: 281.5 },
     image: stepImage(1),
     placeholder: '📂',
   },
@@ -32,8 +44,9 @@ const STEPS = [
     title: 'Choose Publishing Plan',
     description:
       'Following the assessment, we will recommend a suitable publishing package covering the services',
-    color: '#fbd5fa',
-    rotation: 4,
+    color: '#ffd7fd',
+    rotation: 5.56,
+    centre: { x: 728, y: 281 },
     image: stepImage(2),
     placeholder: '👑',
   },
@@ -41,8 +54,9 @@ const STEPS = [
     title: 'Create & Prepare Book',
     description:
       'Your dedicated team will professionally edit, design and format your book for print and digital publication.',
-    color: '#fff0c4',
-    rotation: -4,
+    color: '#fff2c9',
+    rotation: -5,
+    centre: { x: 1086.5, y: 281.5 },
     image: stepImage(3),
     placeholder: '📖',
   },
@@ -50,8 +64,9 @@ const STEPS = [
     title: 'Publish & Promote',
     description:
       'We will publish your book and make it available and distribution networks, including Amazon, Foyles and many more.',
-    color: '#d8cffc',
-    rotation: 4,
+    color: '#dbcfff',
+    rotation: 5,
+    centre: { x: 1435.5, y: 280.5 },
     image: stepImage(4),
     placeholder: '🚀',
   },
@@ -60,6 +75,7 @@ const STEPS = [
 const ProcessSection = () => {
   const sectionRef = useRef(null)
   const cardRefs = useRef([])
+  const slotRefs = useRef([])
 
   const { contextSafe } = useGSAP(
     () => {
@@ -68,39 +84,27 @@ const ProcessSection = () => {
 
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      // Held until the section is reached — it is no longer first on the page.
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 60%', once: true },
+      })
       tl.from('.js-heading-line', { yPercent: 110, duration: 0.9, stagger: 0.12 })
         .from('.js-intro', { y: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, '-=0.6')
 
-      // When the card row scrolls into view: first half slides in from the left, second half from the right.
-      const half = cards.length / 2
-      gsap.from(cards, {
-        x: (i) => (i < half ? -1 : 1) * window.innerWidth * 0.6,
-        opacity: 0,
-        rotation: (i) => (i < half ? -1 : 1) * 12,
-        duration: 1.2,
-        ease: 'power3.out',
-        stagger: { each: 0.15, from: 'edges' },
-        scrollTrigger: {
-          trigger: '.js-process-cards',
-          start: 'top 85%',
-          once: true,
-        },
-      })
+      convergeCards(slotRefs.current, { spread: SPREAD, trigger: '.js-process-cards' })
     },
     { scope: sectionRef }
   )
 
-  // Hovered card straightens in place; cards on either side slide away to open space.
-  // Spreading only applies to the single-row (lg) layout — in the grid it would push cards off-screen.
+  // Hovered card straightens in place; cards on either side slide away. The
+  // gather runs on the outer slot, so the two never fight over one transform.
   const focusCard = contextSafe((active) => {
-    const spread = window.matchMedia('(min-width: 1024px)').matches ? CARD_SPREAD : 0
     gsap.to('.js-process-card', {
-      x: (i) => (i < active ? -spread : i > active ? spread : 0),
+      x: (i) => (i < active ? -CARD_SPREAD : i > active ? CARD_SPREAD : 0),
       rotation: (i) => (i === active ? 0 : STEPS[i].rotation),
       zIndex: (i) => (i === active ? 10 : i + 1),
-      duration: 0.5,
-      ease: 'power3.out',
+      ...HOVER,
       overwrite: 'auto',
     })
   })
@@ -110,51 +114,91 @@ const ProcessSection = () => {
       x: 0,
       rotation: (i) => STEPS[i].rotation,
       zIndex: (i) => i + 1,
-      duration: 0.6,
-      ease: 'power3.out',
+      ...HOVER,
       overwrite: 'auto',
     })
   })
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen overflow-hidden bg-white">
-      <BrushWaveBackground />
+    <section ref={sectionRef} className="relative" style={{ height: PROCESS.height }}>
+      {/* The section is a rounded white panel, inset 20px on every side. */}
+      <div
+        className="absolute overflow-hidden bg-white"
+        style={{ left: 20, top: 20, width: 1880, height: 1080, borderRadius: 100 }}
+      >
+        <div className="absolute" style={{ left: -133, top: 14, width: 2146, height: 1510 }}>
+          <BrushWaveBackground />
+        </div>
 
-      <div className="relative z-10 mx-auto max-w-[1920px] px-5 py-16 sm:px-10 lg:py-24 xl:px-[70px]">
-        <header className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          <h2 className="font-heading text-[clamp(2.25rem,4.3vw,5.25rem)] leading-[1.08] font-extrabold tracking-[-0.04em] text-ink">
-            <span className="block overflow-hidden pb-[0.16em] -mb-[0.12em]">
-              <span className="js-heading-line block">Publishing doesn’t have</span>
-            </span>
-            <span className="block overflow-hidden pb-[0.16em] -mb-[0.12em]">
-              <span className="js-heading-line block">to be complicated.</span>
-            </span>
-          </h2>
+        <h2
+          className="absolute font-heading font-bold text-ink"
+          style={{ left: 130, top: 109, width: 1028, fontSize: 90, lineHeight: '99px' }}
+        >
+          <span className="block overflow-hidden" style={{ height: 99 }}>
+            <span className="js-heading-line block">Publishing doesn’t have</span>
+          </span>
+          <span className="block overflow-hidden" style={{ height: 99 }}>
+            <span className="js-heading-line block">to be complicated.</span>
+          </span>
+        </h2>
 
-          <div className="lg:pt-2 lg:text-left">
-            <p className="js-intro text-[clamp(1.25rem,2vw,2.4rem)] leading-snug text-ink">
-              We take care of the process.
-              <br />
-              You focus on the story.
-            </p>
+        <p
+          className="js-intro absolute font-heading font-semibold text-ink"
+          style={{ left: 1238, top: 128, width: 512, fontSize: 28, lineHeight: '28px' }}
+        >
+          We take care of the process.
+          <br />
+          You focus on the story.
+        </p>
 
-            <a
-              href="#start"
-              className="js-intro group mt-8 inline-flex items-center gap-4 rounded-full bg-cta py-2.5 pr-2.5 pl-6 font-display text-lg font-bold text-ink transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)] sm:text-2xl"
+        <a
+          href="#start"
+          className="js-intro group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
+          style={{ left: 1285, top: 208, width: 465, height: 80 }}
+        >
+          <span
+            className="absolute font-heading font-semibold text-ink"
+            style={{ left: 24, fontSize: 28, lineHeight: '28px' }}
+          >
+            Start Your Publishing Journey
+          </span>
+          <span
+            className="absolute flex items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1"
+            style={{ left: 389, top: 10, width: 60, height: 60 }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              style={{ width: 32, height: 32 }}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              Start Your Publishing Journey
-              <span className="flex size-12 items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1 sm:size-[60px]">
-                <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </span>
-            </a>
-          </div>
-        </header>
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </a>
 
-        <div className="js-process-cards mt-16 grid justify-items-center gap-10 sm:grid-cols-2 lg:mt-20 lg:flex lg:justify-center lg:gap-0">
+        <div
+          className="js-process-cards absolute"
+          style={{ left: 32, top: 367, width: 1817, height: 603 }}
+        >
           {STEPS.map((step, i) => (
-            <div key={step.title} className="w-full max-w-[360px] lg:-mx-1.5 lg:flex-1">
+            <div
+              key={step.title}
+              ref={(el) => {
+                slotRefs.current[i] = el
+              }}
+              className="absolute will-change-transform"
+              style={{
+                left: step.centre.x - CARD_WIDTH / 2,
+                top: step.centre.y - CARD_HEIGHT / 2,
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+              }}
+            >
               <ProcessCard
                 {...step}
                 step={i + 1}

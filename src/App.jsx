@@ -16,8 +16,8 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<LabIndex />} />
-        <Route path="/camblp" element={<CambridgeHome />} />
+        {/* <Route path="/" element={<LabIndex />} /> */}
+        <Route path="/" element={<CambridgeHome />} />
       </Routes>
     </BrowserRouter>
   )
