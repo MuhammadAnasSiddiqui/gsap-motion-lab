@@ -64,7 +64,7 @@ const SiteHeader = () => {
             <a
               key={label}
               href="#start"
-              className="absolute flex items-center justify-center rounded-full bg-white text-ink transition-colors hover:bg-cta"
+              className="absolute flex items-center justify-center rounded-full bg-white text-navy transition-colors hover:bg-cta"
               style={{ left: x, top: 15, width, height: 50, fontSize: 24, lineHeight: '34px' }}
             >
               {label}

@@ -108,6 +108,7 @@ function Radio({ selected }) {
 function PublishForm() {
   const container = useRef(null)
   const [step, setStep] = useState(0)
+  const [done, setDone] = useState(false)
   const [answers, setAnswers] = useState([2, null, null, null])
   const question = QUESTIONS[step]
   const isFirst = step === 0
@@ -120,11 +121,14 @@ function PublishForm() {
       gsap.from('.form-question > *', { x: 32, opacity: 0, duration: 0.45, stagger: 0.06, ease: 'power3.out' })
     })
     return () => mm.revert()
-  }, { scope: container, dependencies: [step] })
+  }, { scope: container, dependencies: [step, done] })
 
   const choose = (index) => setAnswers((prev) => prev.map((a, i) => (i === step ? index : a)))
-  const next = () => { if (!isLast) setStep((s) => s + 1) }
-  const back = () => { if (!isFirst) setStep((s) => s - 1) }
+  const next = () => (isLast ? setDone(true) : setStep((s) => s + 1))
+  const back = () => {
+    if (done) setDone(false)
+    else if (!isFirst) setStep((s) => s - 1)
+  }
 
   return (
     <section ref={container} className="flex flex-col gap-10 px-(--gutter) py-(--pad) lg:flex-row lg:items-center lg:gap-[calc(80*var(--u))]">
@@ -184,10 +188,22 @@ function PublishForm() {
           {/* Stepper */}
           <ol className="flex h-[max(8px,calc(11*var(--u)))] gap-1" aria-label={`Step ${step + 1} of ${QUESTIONS.length}`}>
             {QUESTIONS.map((_, i) => (
-              <li key={i} className={`flex-1 rounded-full transition-colors duration-300 ${i <= step ? 'bg-gold' : 'bg-gold/50'}`} />
+              <li key={i} className={`flex-1 rounded-full transition-colors duration-300 ${done || i <= step ? 'bg-gold' : 'bg-gold/50'}`} />
             ))}
           </ol>
 
+          {done ? (
+            <div className="form-question flex flex-col gap-[max(8px,calc(16*var(--u)))]" key="done">
+              <p className="font-script text-[max(18px,calc(24*var(--u)))] leading-none tracking-[-0.02em] text-gold">
+                All four answered
+              </p>
+              <p className="t-h4 text-navy">Thanks — we have what we need.</p>
+              <p className="t-body text-navy">
+                Our team will put together the package that fits and come back to you with the price
+                up front. Use Back if you want to change an answer.
+              </p>
+            </div>
+          ) : (
           <div className="form-question flex flex-col gap-[max(16px,calc(32*var(--u)))]" key={step}>
             <div className="flex flex-col gap-[max(8px,calc(16*var(--u)))]">
               <p className="font-script text-[max(18px,calc(24*var(--u)))] leading-none tracking-[-0.02em] text-gold">
@@ -226,13 +242,14 @@ function PublishForm() {
               })}
             </div>
           </div>
+          )}
         </div>
 
         <div className="relative flex items-center justify-between">
           <button
             type="button"
             onClick={back}
-            disabled={isFirst}
+            disabled={isFirst && !done}
             className="flex h-[max(44px,calc(60*var(--u)))] cursor-pointer items-center gap-[calc(9*var(--u))] rounded-full bg-[#c0c0c0] pr-[max(14px,calc(18*var(--u)))] pl-[max(8px,calc(12*var(--u)))] font-display text-[max(15px,calc(24*var(--u)))] font-semibold text-navy transition-opacity disabled:cursor-default disabled:opacity-40"
           >
             <span className="grid size-[max(32px,calc(45*var(--u)))] place-items-center rounded-full bg-white">
@@ -243,9 +260,10 @@ function PublishForm() {
           <button
             type="button"
             onClick={next}
-            className="group flex h-[max(44px,calc(60*var(--u)))] cursor-pointer items-center gap-[calc(9*var(--u))] rounded-full bg-gold pr-[max(8px,calc(12*var(--u)))] pl-[max(14px,calc(18*var(--u)))] font-display text-[max(14px,calc(15.75*var(--u)))] font-semibold text-navy transition-colors hover:bg-gold-light"
+            disabled={done}
+            className="group flex h-[max(44px,calc(60*var(--u)))] disabled:cursor-default disabled:opacity-40 cursor-pointer items-center gap-[calc(9*var(--u))] rounded-full bg-gold pr-[max(8px,calc(12*var(--u)))] pl-[max(14px,calc(18*var(--u)))] font-display text-[max(14px,calc(15.75*var(--u)))] font-semibold text-navy transition-colors hover:bg-gold-light"
           >
-            {isLast ? 'Finish' : 'Next'}
+            {done ? 'Done' : isLast ? 'Finish' : 'Next'}
             <span className="grid size-[max(32px,calc(45*var(--u)))] place-items-center rounded-full bg-white">
               <img src={arrow24} alt="" className="w-[max(16px,calc(24*var(--u)))] transition-transform group-hover:translate-x-0.5" />
             </span>

@@ -69,10 +69,10 @@ function AuthorStories() {
       </div>
 
       <div className="flex gap-1.5">
-        <button type="button" onClick={replay} aria-label="Previous story" className="grid size-[max(40px,calc(56*var(--u)))] cursor-pointer place-items-center rounded-full bg-[#124a8a]/40 transition-colors hover:bg-[#124a8a]/60">
+        <button type="button" onClick={replay} aria-label="Replay the before and after" className="grid size-[max(40px,calc(56*var(--u)))] cursor-pointer place-items-center rounded-full bg-[#124a8a]/40 transition-colors hover:bg-[#124a8a]/60">
           <img src={arrowWhite} alt="" className="w-[max(18px,calc(24*var(--u)))] rotate-180" />
         </button>
-        <button type="button" onClick={replay} aria-label="Next story" className="grid size-[max(40px,calc(56*var(--u)))] cursor-pointer place-items-center rounded-full bg-[#124a8a] transition-colors hover:bg-accent">
+        <button type="button" onClick={replay} aria-hidden="true" tabIndex={-1} className="grid size-[max(40px,calc(56*var(--u)))] cursor-pointer place-items-center rounded-full bg-[#124a8a] transition-colors hover:bg-accent">
           <img src={arrowWhite} alt="" className="w-[max(18px,calc(24*var(--u)))]" />
         </button>
       </div>

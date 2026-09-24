@@ -138,7 +138,7 @@ const HeroSection = () => {
         </div>
 
         <h1
-          className="absolute font-heading font-extrabold text-ink capitalize"
+          className="absolute font-heading font-extrabold text-navy capitalize"
           style={{ left: 70, top: 262, width: 1070, fontSize: 120, lineHeight: '120px' }}
         >
           <span className="block overflow-hidden" style={{ height: 120 }}>

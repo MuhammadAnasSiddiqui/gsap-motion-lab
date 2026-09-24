@@ -76,7 +76,7 @@ function Gallery() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="px-(--pad) py-(--pad)">
+    <section ref={container} data-scroll-stops="2" className="px-(--pad) py-(--pad)">
       <div className="gal-stage relative lg:motion-safe:aspect-[1918/925]">
         {/* Blue panel with the diagonal brush stroke */}
         <div className="gal-panel panel absolute inset-0 bg-sky" aria-hidden="true">

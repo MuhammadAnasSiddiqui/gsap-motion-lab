@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useReveal } from '../lib/useReveal'
 import Hero from '../components/Hero'
-import Stats from '../components/sections/Stats'
-import Steps from '../components/sections/Steps'
 import PublishForm from '../components/sections/PublishForm'
 import BookSpin from '../components/sections/BookSpin'
 import Gallery from '../components/sections/Gallery'

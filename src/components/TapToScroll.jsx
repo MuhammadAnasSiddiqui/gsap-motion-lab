@@ -33,8 +33,8 @@ const TapToScroll = () => {
 
   // Inside the canvas a section is walked through before the next one is
   // reached: its top, then even steps until its bottom sits on the screen edge.
-  // Anything rendered after the canvas is ordinary markup, so it falls back to
-  // one screen per step.
+  // Past the canvas the page is ordinary responsive markup, so the stops are
+  // simply the tops of the blocks that follow it.
   const measure = useCallback(() => {
     const vh = window.innerHeight
     const max = Math.max(0, document.documentElement.scrollHeight - vh)
@@ -70,10 +70,37 @@ const TapToScroll = () => {
         for (let i = 1; i <= steps; i++) all.push(at(section.top + (hidden * i) / steps))
       })
 
-      // Continue past the canvas a screen at a time.
-      for (let y = Math.round(top + canvas.offsetHeight); y < max; y += vh) {
-        all.push(y)
-        perSection.push(y)
+      // Past the canvas: one stop per block. A block that morphs through more
+      // than one state — a pinned gallery, say — sets data-scroll-stops to the
+      // number of frames it is worth, and each of those counts as a section.
+      let after = canvas.nextElementSibling
+      while (after) {
+        // A pinned section is wrapped in ScrollTrigger's spacer, so the markup
+        // — and the attribute — is one level in, and the spacer's extra height
+        // is exactly the distance the pin covers.
+        const spacer = after.classList.contains('pin-spacer')
+        const block = spacer ? after.firstElementChild : after
+        const top = Math.round(after.getBoundingClientRect().top + window.scrollY)
+        const span = spacer ? after.offsetHeight - block.offsetHeight : after.offsetHeight - vh
+        const frames = Number(block?.dataset.scrollStops) || 1
+
+        if (frames > 1 && span > 0) {
+          for (let i = 0; i < frames; i++) {
+            const y = Math.round(top + (span * i) / (frames - 1))
+            all.push(y)
+            perSection.push(y)
+          }
+        } else {
+          all.push(top)
+          perSection.push(top)
+          // Still walk anything taller than the screen with the wheel.
+          if (span >= MIN_INNER_STEP) {
+            const steps = Math.ceil(span / vh)
+            for (let i = 1; i <= steps; i++) all.push(Math.round(top + (span * i) / steps))
+          }
+        }
+
+        after = after.nextElementSibling
       }
     } else {
       for (let y = 0; y < max; y += vh) {
