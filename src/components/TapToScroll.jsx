@@ -25,7 +25,10 @@ const BACK = { size: 60, left: 70, top: 33, bottomGap: 94 }
 
 const TapToScroll = () => {
   const animating = useRef(false)
+  // Two ladders: the wheel walks every stop, including the ones inside a tall
+  // section, while the buttons jump whole sections at a time.
   const stops = useRef([])
+  const sectionStops = useRef([])
   const backRef = useRef(null)
 
   // Inside the canvas a section is walked through before the next one is
@@ -37,7 +40,8 @@ const TapToScroll = () => {
     const max = Math.max(0, document.documentElement.scrollHeight - vh)
     const scale = canvasScale()
     const canvas = document.querySelector('[data-design-canvas]')
-    const list = []
+    const all = []
+    const perSection = []
 
     if (canvas) {
       const top = canvas.getBoundingClientRect().top + window.scrollY
@@ -50,34 +54,48 @@ const TapToScroll = () => {
         // Bottom aligned: stop early enough that the section's own bottom edge
         // lands on the screen's, leaving the section above it on show.
         if (section.align === 'bottom') {
-          list.push(at(Math.max(0, section.top + hidden)))
+          const y = at(Math.max(0, section.top + hidden))
+          all.push(y)
+          perSection.push(y)
           return
         }
 
-        list.push(at(section.top))
+        const y = at(section.top)
+        all.push(y)
+        perSection.push(y)
+
         if (hidden < MIN_INNER_STEP) return
 
         const steps = Math.ceil(hidden / screen)
-        for (let i = 1; i <= steps; i++) list.push(at(section.top + (hidden * i) / steps))
+        for (let i = 1; i <= steps; i++) all.push(at(section.top + (hidden * i) / steps))
       })
 
       // Continue past the canvas a screen at a time.
-      for (let y = Math.round(top + canvas.offsetHeight); y < max; y += vh) list.push(y)
+      for (let y = Math.round(top + canvas.offsetHeight); y < max; y += vh) {
+        all.push(y)
+        perSection.push(y)
+      }
     } else {
-      for (let y = 0; y < max; y += vh) list.push(y)
+      for (let y = 0; y < max; y += vh) {
+        all.push(y)
+        perSection.push(y)
+      }
     }
 
-    list.push(max)
-    stops.current = [...new Set(list)].filter((y) => y >= 0 && y <= max).sort((a, b) => a - b)
+    const clean = (list) =>
+      [...new Set([...list, max])].filter((y) => y >= 0 && y <= max).sort((a, b) => a - b)
+
+    stops.current = clean(all)
+    sectionStops.current = clean(perSection)
   }, [])
 
-  const step = useCallback((direction) => {
+  const step = useCallback((direction, ladder = stops) => {
     if (animating.current) return
     const y = window.scrollY
     const next =
       direction > 0
-        ? stops.current.find((s) => s > y + 4)
-        : [...stops.current].reverse().find((s) => s < y - 4)
+        ? ladder.current.find((s) => s > y + 4)
+        : [...ladder.current].reverse().find((s) => s < y - 4)
     if (next == null) return
 
     animating.current = true
@@ -158,7 +176,7 @@ const TapToScroll = () => {
           ref={backRef}
           type="button"
           aria-label="Back"
-          onClick={() => step(-1)}
+          onClick={() => step(-1, sectionStops)}
           className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-ink transition-transform duration-300 hover:-translate-x-1"
           style={{ left: BACK.left, top: BACK.top, width: BACK.size, height: BACK.size }}
         >
@@ -187,7 +205,7 @@ const TapToScroll = () => {
       >
         <button
           type="button"
-          onClick={() => step(1)}
+          onClick={() => step(1, sectionStops)}
           className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100"
           style={{
             width: PILL.width,
