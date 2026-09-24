@@ -202,7 +202,7 @@ const TapToScroll = () => {
           type="button"
           aria-label="Back"
           onClick={() => step(-1, sectionStops)}
-          className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-navy transition-transform duration-300 hover:-translate-x-1 cursor-pointer"
+          className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-ink transition-transform duration-300 hover:-translate-x-1 cursor-pointer"
           style={{ left: BACK.left, top: BACK.top, width: BACK.size, height: BACK.size }}
         >
           <svg
@@ -231,7 +231,7 @@ const TapToScroll = () => {
         <button
           type="button"
           onClick={() => step(1, sectionStops)}
-          className="pointer-events-auto flex flex-col items-center justify-center bg-white text-navy opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
+          className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
           style={{
             width: PILL.width,
             height: PILL.height,
