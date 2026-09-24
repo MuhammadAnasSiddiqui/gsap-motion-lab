@@ -33,14 +33,14 @@ const CtaButton = ({
     {...rest}
   >
     <span
-      className="font-heading font-semibold whitespace-nowrap text-ink"
+      className="font-heading font-semibold whitespace-nowrap text-navy"
       style={{ fontSize: FONT_SIZE, lineHeight: '28px' }}
     >
       {label}
     </span>
 
     <span
-      className="flex shrink-0 items-center justify-center rounded-full bg-white text-ink transition-transform duration-300 group-hover:translate-x-1"
+      className="flex shrink-0 items-center justify-center rounded-full bg-white text-navy transition-transform duration-300 group-hover:translate-x-1"
       style={{ width: DISC, height: DISC }}
     >
       {/* Endpoints inset by half the stroke so the ink measures exactly 24x20. */}

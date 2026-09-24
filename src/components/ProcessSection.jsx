@@ -132,7 +132,7 @@ const ProcessSection = () => {
         </div>
 
         <h2
-          className="absolute font-heading font-bold text-ink"
+          className="absolute font-heading font-bold text-navy"
           style={{ left: 130, top: 109, width: 1028, fontSize: 90, lineHeight: '99px' }}
         >
           <span className="block overflow-hidden" style={{ height: 99 }}>
@@ -144,7 +144,7 @@ const ProcessSection = () => {
         </h2>
 
         <p
-          className="js-intro absolute font-heading font-semibold text-ink"
+          className="js-intro absolute font-heading font-semibold text-navy"
           style={{ left: 1238, top: 128, width: 512, fontSize: 28, lineHeight: '28px' }}
         >
           We take care of the process.
