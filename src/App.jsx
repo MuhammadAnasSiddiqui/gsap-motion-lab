@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import LabIndex from './pages/LabIndex'
-import CambridgeHome from './pages/CambridgeHome'
+import Home from './views/Home'
 
 // Start each route at the top; the sections set up their own ScrollTriggers
 // on mount and tear them down on unmount.
@@ -17,7 +16,8 @@ function App() {
       <ScrollToTop />
       <Routes>
         {/* <Route path="/" element={<LabIndex />} /> */}
-        <Route path="/" element={<CambridgeHome />} />
+        <Route path="/" element={<Home />} />
+        {/* <Route path="/" element={<CambridgeHome />} /> */}
       </Routes>
     </BrowserRouter>
   )
