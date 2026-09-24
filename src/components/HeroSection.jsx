@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import backdrop from '../assets/hero/backdrop.svg'
 import wash from '../assets/hero/wash.svg'
 import cloud from '../assets/hero/cloud.png'
+import CtaButton from './CtaButton'
 import bookVideo from '../assets/hero/hero-video.mp4'
 import { blurOnExit, exitRange } from '../lib/blurOnExit'
 import { HERO } from '../lib/design'
@@ -156,35 +157,7 @@ const HeroSection = () => {
           you.
         </p>
 
-        <a
-          href="#start"
-          className="js-hero-fade group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
-          style={{ left: 70, top: 698, width: 393, height: 80 }}
-        >
-          <span
-            className="absolute font-heading font-semibold text-ink"
-            style={{ left: 24, fontSize: 23, lineHeight: '28px' }}
-          >
-            Start Your Publishing Journey
-          </span>
-          <span
-            className="absolute flex items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1"
-            style={{ left: 317, top: 10, width: 60, height: 60 }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              style={{ width: 32, height: 32 }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </span>
-        </a>
+        <CtaButton className="js-hero-fade absolute" style={{ left: 70, top: 698 }} />
       </div>
     </section>
   )

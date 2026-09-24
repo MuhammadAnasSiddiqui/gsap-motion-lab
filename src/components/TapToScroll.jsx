@@ -19,9 +19,9 @@ const STEP_DURATION = 1.2
 // 24px of padding at each end, 8px between label and arrow.
 const PILL = { width: 44, height: 185, radius: 80, padding: 24, gap: 8, label: 107, arrow: 22 }
 
-// The back control: a 60px disc that parks near the bottom left while the hero
-// is on screen, then rides up into the logo's slot for every section after it.
-const BACK = { size: 60, left: 70, top: 33, bottomGap: 94 }
+// The back control: a 60px disc in the logo's slot. There is nothing to go back
+// to from the hero, so it only appears once the hero hands over.
+const BACK = { size: 60, left: 70, top: 33 }
 
 const TapToScroll = () => {
   const animating = useRef(false)
@@ -141,19 +141,17 @@ const TapToScroll = () => {
 
     window.addEventListener('keydown', onKey)
 
-    // While the hero is up the disc sits near the bottom of the screen; it
-    // travels into the header slot over the same hand-over the hero zooms on.
+    // The disc takes the logo's slot over the same hand-over that fades the
+    // logo out, so the two swap places rather than overlapping.
     const hero = document.querySelector('[data-hero]')
     if (hero) {
       const { start, end } = exitRange(hero)
-      const parked = () =>
-        window.innerHeight / canvasScale() - BACK.bottomGap - BACK.size - BACK.top
 
       gsap.fromTo(
         backRef.current,
-        { y: parked },
+        { autoAlpha: 0 },
         {
-          y: 0,
+          autoAlpha: 1,
           ease: 'none',
           scrollTrigger: { trigger: hero, start, end, scrub: true, invalidateOnRefresh: true },
         }
@@ -177,7 +175,7 @@ const TapToScroll = () => {
           type="button"
           aria-label="Back"
           onClick={() => step(-1, sectionStops)}
-          className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-ink transition-transform duration-300 hover:-translate-x-1"
+          className="pointer-events-auto absolute flex items-center justify-center rounded-full bg-cta text-ink transition-transform duration-300 hover:-translate-x-1 cursor-pointer"
           style={{ left: BACK.left, top: BACK.top, width: BACK.size, height: BACK.size }}
         >
           <svg
@@ -196,17 +194,17 @@ const TapToScroll = () => {
       </div>
 
       <div
-        className="pointer-events-none fixed right-0 z-50"
+        className="pointer-events-none fixed right-10 z-50"
         style={{
           top: '50%',
-          transform: 'translateY(-50%) scale(var(--design-scale, 1))',
+          transform: 'translateY(-50%) scale(var(--design-scale, 1)) ',
           transformOrigin: 'right center',
         }}
       >
         <button
           type="button"
           onClick={() => step(1, sectionStops)}
-          className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100"
+          className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
           style={{
             width: PILL.width,
             height: PILL.height,
