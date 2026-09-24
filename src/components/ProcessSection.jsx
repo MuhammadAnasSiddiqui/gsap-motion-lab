@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import BrushWaveBackground from './BrushWaveBackground'
+import CtaButton from './CtaButton'
 import ProcessCard, { CARD_HEIGHT, CARD_WIDTH } from './ProcessCard'
 import { convergeCards } from '../lib/convergeCards'
 import { PROCESS } from '../lib/design'
@@ -151,35 +152,7 @@ const ProcessSection = () => {
           You focus on the story.
         </p>
 
-        <a
-          href="#start"
-          className="js-intro group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
-          style={{ left: 1285, top: 208, width: 465, height: 80 }}
-        >
-          <span
-            className="absolute font-heading font-semibold text-ink"
-            style={{ left: 24, fontSize: 28, lineHeight: '28px' }}
-          >
-            Start Your Publishing Journey
-          </span>
-          <span
-            className="absolute flex items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1"
-            style={{ left: 389, top: 10, width: 60, height: 60 }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              style={{ width: 32, height: 32 }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </span>
-        </a>
+        <CtaButton className="js-intro absolute" style={{ left: 1285, top: 208 }} />
 
         <div
           className="js-process-cards absolute"
