@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import logo from '../assets/hero/logo.svg'
+import CtaButton from './CtaButton'
 import { exitRange } from '../lib/blurOnExit'
 import { DESIGN_WIDTH } from '../lib/design'
 
@@ -71,35 +72,7 @@ const SiteHeader = () => {
           ))}
         </nav>
 
-        <a
-          href="#start"
-          className="group absolute flex items-center rounded-full bg-cta transition-shadow hover:shadow-[0_12px_30px_-10px_rgba(242,208,90,0.9)]"
-          style={{ left: 1387, top: 0, width: 393, height: 80 }}
-        >
-          <span
-            className="absolute font-heading font-semibold text-ink"
-            style={{ left: 24, fontSize: 23, lineHeight: '28px' }}
-          >
-            Start Your Publishing Journey
-          </span>
-          <span
-            className="absolute flex items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1"
-            style={{ left: 317, top: 10, width: 60, height: 60 }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              style={{ width: 32, height: 32 }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </span>
-        </a>
+        <CtaButton className="absolute" style={{ left: 1387, top: 0 }} />
       </header>
     </div>
   )
