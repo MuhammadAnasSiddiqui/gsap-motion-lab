@@ -1,99 +1,192 @@
-import stepSubmit from "@/assets/images/step-submit.webp";
-import stepPlan from "@/assets/images/step-plan.webp";
-import stepCreate from "@/assets/images/step-create.webp";
-import stepPublish from "@/assets/images/step-publish.webp";
-import CtaButton from "./CtaButton";
+import React, { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import BrushWaveBackground from './BrushWaveBackground'
+import CtaButton from './CtaButton'
+import ProcessCard, { CARD_HEIGHT, CARD_WIDTH } from './ProcessCard'
+import { convergeCards } from '../lib/convergeCards'
+import { PROCESS } from '../lib/design'
 
+gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+// Card illustrations: drop step-1.png … step-4.png into src/assets/process/.
+// Missing files just fall back to the placeholder.
+const images = import.meta.glob('../assets/process/step-*.{png,webp,jpg,jpeg,avif}', {
+  eager: true,
+  import: 'default',
+})
+const stepImage = (n) =>
+  Object.entries(images).find(([path]) => path.includes(`/step-${n}.`))?.[1] ?? null
+
+// Figma: the step cards start 6.92x further from the row centre and gather in
+// as the section scrolls up.
+const SPREAD = 6.92
+
+// Hover: the card under the pointer straightens and its neighbours step aside.
+// Figma animates this with its BOUNCY spring over ~1.2s. No scaling — the cards
+// keep their size.
+const CARD_SPREAD = 48
+const HOVER = { duration: 0.9, ease: 'back.out(1.6)' }
+
+// Card centres inside the 1817-wide row, straight from the frame.
 const STEPS = [
   {
-    label: "Step#1",
-    title: "Submit Your Manuscript",
-    body: "Send us your completed manuscript, draft or book idea. Our team will review your work, understand your goals.",
-    image: stepSubmit,
-    color: "bg-step-cyan",
+    title: 'Submit Your Manuscript',
+    description:
+      'Send us your completed manuscript, draft or book idea. Our team will review your work, understand your goals.',
+    color: '#befdff',
+    rotation: -5,
+    centre: { x: 372.5, y: 281.5 },
+    image: stepImage(1),
+    placeholder: '📂',
   },
   {
-    label: "Step#2",
-    title: "Choose Publishing Plan",
-    body: "Following the assessment, we will recommend a suitable publishing package covering the services.",
-    image: stepPlan,
-    color: "bg-step-pink",
+    title: 'Choose Publishing Plan',
+    description:
+      'Following the assessment, we will recommend a suitable publishing package covering the services',
+    color: '#ffd7fd',
+    rotation: 5.56,
+    centre: { x: 728, y: 281 },
+    image: stepImage(2),
+    placeholder: '👑',
   },
   {
-    label: "Step#3",
-    title: "Create & Prepare Book",
-    body: "Your dedicated team will professionally edit, design and format your book for print and digital publication.",
-    image: stepCreate,
-    color: "bg-step-cream",
+    title: 'Create & Prepare Book',
+    description:
+      'Your dedicated team will professionally edit, design and format your book for print and digital publication.',
+    color: '#fff2c9',
+    rotation: -5,
+    centre: { x: 1086.5, y: 281.5 },
+    image: stepImage(3),
+    placeholder: '📖',
   },
   {
-    label: "Step#4",
-    title: "Publish & Promote",
-    body: "We will publish your book and make it available on distribution networks, including Amazon, Foyles and many more.",
-    image: stepPublish,
-    color: "bg-step-lilac",
+    title: 'Publish & Promote',
+    description:
+      'We will publish your book and make it available and distribution networks, including Amazon, Foyles and many more.',
+    color: '#dbcfff',
+    rotation: 5,
+    centre: { x: 1435.5, y: 280.5 },
+    image: stepImage(4),
+    placeholder: '🚀',
   },
-];
+]
 
-// Soft brush-stroke arches behind the cards (desktop story layout only).
-const ARCHES = [
-  "left-[-40px] rotate-[-4deg]",
-  "left-[320px] rotate-[3deg]",
-  "left-[690px] rotate-[-2deg]",
-  "left-[1050px] rotate-[4deg]",
-  "left-[1300px] rotate-[-3deg]",
-];
+const ProcessSection = () => {
+  const sectionRef = useRef(null)
+  const cardRefs = useRef([])
+  const slotRefs = useRef([])
 
-// No GSAP here: this scene is choreographed by the master timeline in LandingPage.jsx.
-// The classes it animates are `.scene-process`, `.process-intro`, `.process-cards` and `.process-card`.
-export default function ProcessSection() {
+  const { contextSafe } = useGSAP(
+    () => {
+      const cards = cardRefs.current
+      cards.forEach((card, i) => gsap.set(card, { rotation: STEPS[i].rotation, zIndex: i + 1 }))
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+      // Held until the section is reached — it is no longer first on the page.
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 60%', once: true },
+      })
+      tl.from('.js-heading-line', { yPercent: 110, duration: 0.9, stagger: 0.12 })
+        .from('.js-intro', { y: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, '-=0.6')
+
+      convergeCards(slotRefs.current, { spread: SPREAD, trigger: '.js-process-cards' })
+    },
+    { scope: sectionRef }
+  )
+
+  // Hovered card straightens in place; cards on either side slide away. The
+  // gather runs on the outer slot, so the two never fight over one transform.
+  const focusCard = contextSafe((active) => {
+    gsap.to('.js-process-card', {
+      x: (i) => (i < active ? -CARD_SPREAD : i > active ? CARD_SPREAD : 0),
+      rotation: (i) => (i === active ? 0 : STEPS[i].rotation),
+      zIndex: (i) => (i === active ? 10 : i + 1),
+      ...HOVER,
+      overwrite: 'auto',
+    })
+  })
+
+  const resetCards = contextSafe(() => {
+    gsap.to('.js-process-card', {
+      x: 0,
+      rotation: (i) => STEPS[i].rotation,
+      zIndex: (i) => i + 1,
+      ...HOVER,
+      overwrite: 'auto',
+    })
+  })
+
   return (
-    <section className="scene scene-process relative bg-mist px-5 py-20 story:absolute story:overflow-hidden story:inset-0 story:z-10 story:p-0">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden story:block">
-        {ARCHES.map((arch) => (
-          <div
-            key={arch}
-            className={`absolute bottom-[-120px] h-[700px] w-[300px] rounded-t-full bg-[#e4f0fc] ${arch}`}
-          />
-        ))}
-      </div>
-
-      <div className="relative mx-auto max-w-[1440px] story:h-full">
-        <div className="flex flex-col gap-6 laptop:flex-row laptop:items-start laptop:justify-between story:absolute story:top-[92px] story:right-[100px] story:left-[110px]">
-          <h2 className="process-intro reveal font-display text-4xl leading-[1.05] font-bold tracking-tight text-ink tablet-sm:text-5xl story:text-[64px] story:leading-[1.12]">
-            Publishing doesn’t have <br className="hidden tablet-sm:block" />
-            to be complicated.
-          </h2>
-          <div className="process-intro reveal story:pt-[14px]">
-            <p className="font-display text-lg leading-tight font-semibold text-ink story:text-[21px]">
-              We take care of the process.
-              <br />
-              You focus on the story.
-            </p>
-            <CtaButton className="mt-5 story:mt-[26px]" />
-          </div>
+    <section ref={sectionRef} className="relative" style={{ height: PROCESS.height }}>
+      {/* The section is a rounded white panel, inset 20px on every side. */}
+      <div
+        className="absolute overflow-hidden bg-white"
+        style={{ left: 20, top: 20, width: 1880, height: 1080, borderRadius: 100 }}
+      >
+        <div className="absolute" style={{ left: -133, top: 14, width: 2146, height: 1510 }}>
+          <BrushWaveBackground />
         </div>
 
-        <div className="process-cards mt-12 grid gap-6 tablet-sm:grid-cols-2 laptop:grid-cols-4 story:absolute story:top-[296px] story:left-[166px] story:mt-0 story:flex story:gap-0">
-          {STEPS.map((step) => (
-            <article
-              key={step.label}
-              className={`process-card reveal rounded-[26px] px-7 pt-5 pb-8 text-ink shadow-[0_18px_40px_-24px_rgb(11_27_63/0.35)] ${step.color} story:h-[404px] story:w-[270px] story:px-[26px]`}
+        <h2
+          className="absolute font-heading font-bold text-navy"
+          style={{ left: 130, top: 109, width: 1028, fontSize: 90, lineHeight: '99px' }}
+        >
+          <span className="block overflow-hidden" style={{ height: 99 }}>
+            <span className="js-heading-line block">Publishing doesn’t have</span>
+          </span>
+          <span className="block overflow-hidden" style={{ height: 99 }}>
+            <span className="js-heading-line block">to be complicated.</span>
+          </span>
+        </h2>
+
+        <p
+          className="js-intro absolute font-heading font-semibold text-navy"
+          style={{ left: 1238, top: 128, width: 512, fontSize: 28, lineHeight: '28px' }}
+        >
+          We take care of the process.
+          <br />
+          You focus on the story.
+        </p>
+
+        <CtaButton className="js-intro absolute" style={{ left: 1285, top: 208 }} />
+
+        <div
+          className="js-process-cards absolute"
+          style={{ left: 32, top: 367, width: 1817, height: 603 }}
+        >
+          {STEPS.map((step, i) => (
+            <div
+              key={step.title}
+              ref={(el) => {
+                slotRefs.current[i] = el
+              }}
+              className="absolute will-change-transform"
+              style={{
+                left: step.centre.x - CARD_WIDTH / 2,
+                top: step.centre.y - CARD_HEIGHT / 2,
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+              }}
             >
-              <p className="text-center font-script text-[18px]">{step.label}</p>
-              <img
-                src={step.image}
-                alt=""
-                className="mx-auto mt-3 h-[150px] w-auto object-contain"
+              <ProcessCard
+                {...step}
+                step={i + 1}
+                cardRef={(el) => {
+                  cardRefs.current[i] = el
+                }}
+                onEnter={() => focusCard(i)}
+                onLeave={resetCards}
               />
-              <h3 className="mt-4 font-display text-[22px] leading-tight font-bold">
-                {step.title}
-              </h3>
-              <p className="mt-3 text-[15px] leading-snug text-ink/85">{step.body}</p>
-            </article>
+            </div>
           ))}
         </div>
       </div>
     </section>
-  );
+  )
 }
+
+export default ProcessSection

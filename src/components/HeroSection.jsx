@@ -1,191 +1,166 @@
-import { useRef } from "react";
-import gsap from "gsap";
-import { SplitText } from "gsap/SplitText";
-import { useGSAP } from "@gsap/react";
-import heroBook from "@/assets/images/hero-book.webp";
-import heroClouds from "@/assets/images/hero-clouds.webp";
-import CtaButton from "./CtaButton";
-import { SparkleIcon } from "./Icons";
+import React, { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import backdrop from '../assets/hero/backdrop.svg'
+import wash from '../assets/hero/wash.svg'
+import cloud from '../assets/hero/cloud.png'
+import CtaButton from './CtaButton'
+import bookVideo from '../assets/hero/hero-video.mp4'
+import { blurOnExit, exitRange } from '../lib/blurOnExit'
+import { HERO } from '../lib/design'
 
-gsap.registerPlugin(useGSAP, SplitText);
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-// Positions and sizes come from the 1440 × 780 Figma frame (desktop story layout only).
-const SPARKLES = [
-  "top-[124px] left-[730px] size-9",
-  "top-[116px] left-[1380px] size-6",
-  "top-[350px] left-[104px] size-11",
-  "top-[454px] left-[722px] size-11",
-  "top-[338px] left-[914px] size-5",
-];
+// Resting layout = Figma's "Hero Section - 2"; the entry animates in from
+// "Hero Section - 1", where only the artwork sits differently.
+const FROM_FIRST_FRAME = {
+  backdrop: { y: 51 },
+  cloud: { x: -224, y: 132 },
+  book: { x: 36, y: -29 },
+}
 
-export default function HeroSection() {
-  const heroRef = useRef(null);
+// Leaving the section, Figma scales the hero to 1.87x and lifts it 0.53 of its
+// own height faster than the page scrolls — a push-in as the next section
+// slides over the top.
+const EXIT_SCALE = 1.87
+const EXIT_LIFT = 0.53
 
-  // The hero has two kinds of motion, and neither depends on scroll:
-  //   1. an intro timeline that plays once on page load
-  //   2. ambient loops (floating book, twinkling sparkles, light sweep) that repeat forever
-  // Moving the hero out of view on scroll is handled separately by LandingPage,
-  // which animates the outer `.scene-hero` wrapper and never touches these inner elements.
+// Figma masks a square 689x689 artwork down to a 492x628 cut-out. This video
+// carries no background of its own, so it plays at the full square size in the
+// exact place that artwork sat — the book lands where it always did, uncropped.
+const BOOK = { x: 1156, y: 237, size: 689 }
+
+const HeroSection = () => {
+  const sectionRef = useRef(null)
+  const stageRef = useRef(null)
+  const videoRef = useRef(null)
+
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Leave the poster frame up rather than looping a video at someone who
+        // asked for less movement.
+        videoRef.current?.pause()
+        return
+      }
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // SplitText wraps each line and word of the heading in its own element.
-        // `mask: "lines"` adds an overflow-hidden wrapper per line, so words slide up
-        // from behind an invisible edge instead of fading in from nowhere.
-        // `autoSplit` re-splits when fonts load or the width changes. Returning the tween
-        // from `onSplit` lets SplitText revert it and rebuild it at the same progress.
-        SplitText.create(".hero-title", {
-          type: "lines,words",
-          mask: "lines",
-          autoSplit: true,
-          onSplit: (self) =>
-            gsap.from(self.words, {
-              yPercent: 110,
-              duration: 0.9,
-              stagger: 0.06,
-              ease: "power4.out",
-              delay: 0.25,
-            }),
-        });
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      tl.from('.js-hero-line', { yPercent: 115, duration: 1, stagger: 0.12 })
+        .from('.js-hero-fade', { y: 28, opacity: 0, duration: 0.8, stagger: 0.12 }, '-=0.65')
+        .from(
+          '.js-hero-book',
+          { scale: 0.86, opacity: 0, rotate: -6, duration: 1.1, ease: 'back.out(1.4)' },
+          '-=0.95'
+        )
 
-        // Timeline positions (the number after the vars object) are absolute times in seconds,
-        // so each element can start while the previous one is still moving.
-        gsap
-          .timeline({ defaults: { ease: "power3.out" } })
-          .from(".hero-card", { autoAlpha: 0, scale: 0.97, duration: 1 }, 0)
-          .from(".hero-book", { autoAlpha: 0, x: 160, rotation: 10, duration: 1.2 }, 0.35)
-          .from(".hero-fade", { autoAlpha: 0, y: 30, duration: 0.8, stagger: 0.12 }, 0.75)
-          .from(
-            ".hero-sparkle",
-            { scale: 0, rotation: -90, duration: 0.6, stagger: 0.08, ease: "back.out(2)" },
-            0.9,
-          );
+      // Figma runs this settle with EASE_IN over 2s, underneath the copy.
+      tl.from('.js-hero-backdrop', { ...FROM_FIRST_FRAME.backdrop, duration: 2, ease: 'power2.in' }, 0)
+        .from('.js-hero-cloud', { ...FROM_FIRST_FRAME.cloud, duration: 2, ease: 'power2.in' }, 0)
+        .from('.js-hero-book', { ...FROM_FIRST_FRAME.book, duration: 2, ease: 'power2.in' }, 0)
 
-        // Ambient loops. `yoyo` plays each repeat backwards, so the motion eases back and forth
-        // without a jump. They animate child elements (`-float`, `-glyph`, `-shine`) so they never
-        // compete with the intro tweens above for the same transform.
-        gsap.to(".hero-book-float", {
-          y: -14,
-          duration: 2.4,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
+      // The float lives on the inner wrapper so it never fights the settle above.
+      gsap.to('.js-hero-float', {
+        y: 18,
+        duration: 3.2,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        delay: 2,
+      })
 
-        gsap.to(".hero-sparkle-glyph", {
-          scale: 0.55,
-          opacity: 0.45,
-          duration: 1.6,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          stagger: { each: 0.35, from: "random" },
-          delay: 1.6,
-        });
+      blurOnExit(sectionRef.current)
 
-        // A soft highlight sweeps across the book cover every few seconds.
-        gsap.fromTo(
-          ".hero-book-shine",
-          { xPercent: -160 },
-          {
-            xPercent: 260,
-            duration: 1.4,
-            ease: "power2.inOut",
-            repeat: -1,
-            repeatDelay: 2.6,
-            delay: 1.8,
-          },
-        );
-      });
-
-      return () => mm.revert();
+      // Only over the hand-over range: scrolling inside the hero leaves it alone.
+      const { start, end } = exitRange(sectionRef.current)
+      gsap.to(stageRef.current, {
+        scale: EXIT_SCALE,
+        y: -EXIT_LIFT * HERO.height,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start,
+          end,
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      })
     },
-    { scope: heroRef },
-  );
+    { scope: sectionRef }
+  )
 
   return (
     <section
-      id="top"
-      ref={heroRef}
-      className="scene scene-hero relative story:absolute story:inset-0 story:z-40 story:bg-white"
+      ref={sectionRef}
+      data-hero
+      className="relative overflow-hidden bg-[#d2e6fc]"
+      style={{ height: HERO.height, borderBottomLeftRadius: 150, borderBottomRightRadius: 150 }}
     >
-      <div className="hero-card relative overflow-hidden rounded-b-[48px] bg-[linear-gradient(135deg,#d2e6fc_0%,#eef5fe_42%,#e4effd_68%,#a9cbfa_100%)] px-5 pt-28 pb-20 story:absolute story:inset-x-0 story:top-0 story:h-187.5 story:rounded-b-[90px] story:p-0">
-        {/* Background decoration */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 1440 750"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-0 size-full"
-        >
-          <defs>
-            <linearGradient id="hero-wave" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#a8cdfb" />
-              <stop offset="1" stopColor="#5f97f7" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M0 0h440c-40 70-170 96-300 120C70 132 25 150 0 176Z"
-            fill="#cfe3fb"
-            opacity="0.6"
-          />
-          <path
-            d="M500 750c170-120 380-170 600-214 170-34 270-150 340-220v434Z"
-            fill="#b9d6fb"
-            opacity="0.6"
-          />
-          <path
-            d="M950 750c120-96 260-118 380-150 60-16 90-60 110-96v246Z"
-            fill="url(#hero-wave)"
-          />
-        </svg>
+      <div ref={stageRef} className="absolute inset-0 will-change-transform">
+        {/* A second wash of the same gradient shape sits under the backdrop. */}
         <img
-          src={heroClouds}
+          src={wash}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 w-85 mix-blend-multiply mask-[radial-gradient(110%_95%_at_0%_100%,black_55%,transparent_85%)] story:bottom-2.5 story:w-125"
+          className="absolute max-w-none select-none"
+          style={{ left: -170, top: -88, width: 753, height: 578 }}
         />
-        {SPARKLES.map((position) => (
-          <span
-            key={position}
+        <img
+          src={backdrop}
+          alt=""
+          aria-hidden="true"
+          className="js-hero-backdrop absolute max-w-none select-none"
+          style={{ left: -173, top: -337, width: 2600, height: 1691 }}
+        />
+        <img
+          src={cloud}
+          alt=""
+          aria-hidden="true"
+          className="js-hero-cloud absolute max-w-none select-none"
+          style={{ left: -100, top: 612, width: 875, height: 583 }}
+        />
+
+        <div
+          className="js-hero-book absolute"
+          style={{ left: BOOK.x, top: BOOK.y, width: BOOK.size, height: BOOK.size }}
+        >
+          <video
+            ref={videoRef}
+            src={bookVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
             aria-hidden="true"
-            className={`hero-sparkle absolute hidden text-[#bcd6f5] story:block ${position}`}
-          >
-            <SparkleIcon className="hero-sparkle-glyph size-full" />
-          </span>
-        ))}
-
-        <div className="relative mx-auto flex max-w-360 flex-col gap-12 laptop:flex-row laptop:items-center laptop:justify-between story:block story:h-full">
-          <div className="story:absolute story:top-46.5 story:left-13">
-            <h1 className="hero-title font-display text-5xl leading-[1.02] font-bold tracking-tight text-ink tablet-sm:text-6xl story:text-[88px] story:leading-[1.02] story:tracking-[-0.015em]">
-              Your Story Deserves <br className="hidden tablet-sm:block" />
-              To Be A Book.
-            </h1>
-            <p className="hero-fade mt-6 max-w-170 text-lg leading-relaxed text-slate-600 tablet-sm:text-xl story:mt-13 story:text-[30px] story:leading-[1.4]">
-              We are here to help. Our editors will make the difficult process of publication easier
-              for you.
-            </p>
-            <CtaButton className="hero-fade mt-8 story:mt-9" />
-          </div>
-
-          <div className="hero-book mx-auto w-60 shrink-0 tablet-sm:w-75 story:absolute story:top-49 story:left-234.5 story:w-93">
-            <div className="hero-book-float relative">
-              <img
-                src={heroBook}
-                alt="10 Reasons to Choose Cambridge for Book Publishing, a Cambridge Book Publishing guide"
-                className="w-full mix-blend-multiply"
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-[2%] right-[8%] left-[12%] overflow-hidden"
-              >
-                <div className="hero-book-shine absolute inset-y-0 w-1/3 -skew-x-12 bg-linear-to-r from-transparent via-white/35 to-transparent" />
-              </div>
-            </div>
-          </div>
+            className="js-hero-float size-full object-contain"
+          />
         </div>
+
+        <h1
+          className="absolute font-heading font-extrabold text-navy capitalize"
+          style={{ left: 70, top: 262, width: 1070, fontSize: 120, lineHeight: '120px' }}
+        >
+          <span className="block overflow-hidden" style={{ height: 120 }}>
+            <span className="js-hero-line block">Your story deserves</span>
+          </span>
+          <span className="block overflow-hidden" style={{ height: 120 }}>
+            <span className="js-hero-line block">to be a book.</span>
+          </span>
+        </h1>
+
+        <p
+          className="js-hero-fade absolute text-[#4a5468]"
+          style={{ left: 70, top: 544, width: 908, fontSize: 40, lineHeight: '56px', letterSpacing: '-0.4px' }}
+        >
+          We are here to help. Our editors will make the difficult process of publication easier for
+          you.
+        </p>
+
+        <CtaButton className="js-hero-fade absolute" style={{ left: 70, top: 698 }} />
       </div>
     </section>
-  );
+  )
 }
+
+export default HeroSection

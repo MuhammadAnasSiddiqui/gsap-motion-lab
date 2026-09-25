@@ -1,70 +1,81 @@
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import logo from "@/assets/images/logo.webp";
-import CtaButton from "./CtaButton";
-import { ArrowLeftIcon } from "./Icons";
+import React, { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import logo from '../assets/hero/logo.svg'
+import CtaButton from './CtaButton'
+import { exitRange } from '../lib/blurOnExit'
+import { DESIGN_WIDTH } from '../lib/design'
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const NAV_LINKS = ["Publish Your Book", "Services", "Portfolio", "Author Stories", "About"];
+// The header holds the same place on every frame of the prototype, so it is
+// pinned rather than scrolled. It sits outside <DesignCanvas> and borrows the
+// canvas scale, which DesignCanvas publishes as --design-scale.
 
-export default function SiteHeader({ onBack }) {
-  const headerRef = useRef(null);
+// Header box: 1780x80 at (70, 30). Everything below is relative to it.
+const BOX = { x: 70, y: 30, width: 1780, height: 80 }
 
-  // Intro: the whole bar drops in once on page load.
-  // It animates `.header-bar` only. The children (`.header-logo`, `.header-cta`, `.nav-pill`,
-  // `.header-back`) belong to the scroll timeline in LandingPage. Two tweens fighting over
-  // the same element and property would record each other's values and break when reversed.
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.from(".header-bar", { y: -32, autoAlpha: 0, duration: 0.8, ease: "power3.out" });
-      });
-      return () => mm.revert();
-    },
-    { scope: headerRef },
-  );
+const NAV = [
+  { label: 'Publish Your Book', x: 480, width: 221 },
+  { label: 'Services', x: 708, width: 122 },
+  { label: 'Portfolio', x: 837, width: 118 },
+  { label: 'Author Stories', x: 962, width: 187 },
+  { label: 'About', x: 1156, width: 96 },
+]
+
+const SiteHeader = () => {
+  const logoRef = useRef(null)
+
+  // The back control takes this slot from the second section on, so the mark
+  // clears out over the same hand-over that carries the disc up here.
+  useGSAP(() => {
+    const hero = document.querySelector('[data-hero]')
+    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const { start, end } = exitRange(hero)
+    gsap.to(logoRef.current, {
+      autoAlpha: 0,
+      ease: 'none',
+      scrollTrigger: { trigger: hero, start, end, scrub: true, invalidateOnRefresh: true },
+    })
+  })
 
   return (
-    <header ref={headerRef} className="absolute inset-x-0 top-0 z-50">
-      <div className="header-bar mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 story:h-[104px] story:px-[52px] story:py-0">
-        <div className="relative flex items-center story:w-[322px]">
-          {/* Back button: hidden in the hero, faded in by the scroll timeline for later scenes. */}
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label="Previous section"
-            className="header-back absolute left-0 hidden size-11 cursor-pointer place-items-center rounded-full bg-sun text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-royal story:grid"
-          >
-            <ArrowLeftIcon className="size-5" />
-          </button>
-          <a href="#top" className="header-logo block" aria-label="Cambridge Book Publishing home">
-            <img
-              src={logo}
-              alt="Cambridge Book Publishing"
-              className="h-10 w-auto mix-blend-multiply story:h-[58px]"
-            />
-          </a>
-        </div>
+    <div
+      className="pointer-events-none fixed top-0 left-0 z-40 origin-top-left"
+      style={{ width: DESIGN_WIDTH, transform: 'scale(var(--design-scale, 1))' }}
+    >
+      <header
+        className="pointer-events-auto relative"
+        style={{ marginLeft: BOX.x, marginTop: BOX.y, width: BOX.width, height: BOX.height }}
+      >
+        <a
+          ref={logoRef}
+          href="#top"
+          className="absolute"
+          style={{ left: 0, top: 4, width: 307, height: 71 }}
+        >
+          <img src={logo} alt="Cambridge Book Publishing" className="size-full" />
+        </a>
 
-        <nav aria-label="Main" className="hidden gap-2 tablet:flex">
-          {NAV_LINKS.map((link) => (
+        <nav>
+          {NAV.map(({ label, x, width }) => (
             <a
-              key={link}
-              href="#top"
-              className="nav-pill rounded-full bg-white px-4 py-2 text-[15px] whitespace-nowrap text-ink transition-colors hover:text-royal story:px-4 story:py-[9px] story:text-[18px]"
+              key={label}
+              href="#start"
+              className="absolute flex items-center justify-center rounded-full bg-white text-navy transition-colors hover:bg-cta"
+              style={{ left: x, top: 15, width, height: 50, fontSize: 24, lineHeight: '34px' }}
             >
-              {link}
+              {label}
             </a>
           ))}
         </nav>
 
-        <div className="flex justify-end story:w-[322px]">
-          <CtaButton className="header-cta hidden tablet-sm:inline-flex" />
-        </div>
-      </div>
-    </header>
-  );
+        <CtaButton className="absolute" style={{ left: 1387, top: 0 }} />
+      </header>
+    </div>
+  )
 }
+
+export default SiteHeader

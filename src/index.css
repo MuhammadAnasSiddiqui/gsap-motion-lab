@@ -1,19 +1,160 @@
 @import "tailwindcss";
 
-/*
- * `story:` variant — the pinned, scroll-scrubbed desktop layout.
- * It applies from the `laptop` breakpoint (1023px) up, for visitors who haven't asked for reduced motion.
- * LandingPage.jsx uses the exact same media query in gsap.matchMedia(), so the CSS
- * layout and the GSAP timeline always switch on and off together.
- */
+/* Optional licensed fonts; the theme fallbacks apply until files are supplied. */
+@font-face {
+  font-family: "Merculia";
+  src:
+    url("/fonts/Merculia.woff2") format("woff2"),
+    url("/fonts/Merculia.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("/fonts/InterDisplay.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rentan Yena";
+  src: url("/fonts/RentanYena.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bringbold Nineties";
+  src: url("/fonts/BringboldNineties.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* Cambridge Book Publishing — tokens from the Figma comp */
+  --color-navy: #081a3a;
+  --color-ink: #090c24;
+  --color-gold: #f3cd5a;
+  --color-gold-light: #f7d76d;
+  --color-sky: #d2e6fc;
+  --color-sky-soft: #e8eff8;
+  --color-muted: #4a5468;
+  --color-accent: #004a91;
+  --color-accent-bright: #006cd8;
+  --color-cream: #fdf9f0;
+  --color-frost: #e2effd;
+  --color-border: #cbdce9;
+  --color-cta: #f3cd5a;
+
+  /* Merculia / Inter Display are commercial faces; the Google Fonts fallbacks
+     are the closest free matches (Gabarito was measured nearest in width). */
+  --font-display: "Merculia", "Gabarito", system-ui, sans-serif;
+  --font-body: "Inter Display", "Inter", system-ui, sans-serif;
+  --font-script: "Springlake", "Rentan Yena", "Caveat", cursive;
+  --font-lexend: "Lexend", "Inter", system-ui, sans-serif;
+  --font-nunito: "Nunito", "Inter", system-ui, sans-serif;
+  --font-heading: "Merculia", "Gabarito", system-ui, sans-serif;
+  --font-hand: "Rentan Yena", Caveat, cursive;
+  --font-nav: "Bringbold Nineties", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+}
+
+:root {
+  /* One "design pixel" of the 1920-wide comp, capped at 1px so nothing
+     scales past the source size. Use calc(N * var(--u)) for comp values. */
+  --u: min(1px, calc(100vw / 1920));
+  --gutter: max(20px, calc(70 * var(--u)));
+  /* Outer breathing room around the rounded "panel" sections. */
+  --pad: max(12px, calc(20 * var(--u)));
+
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: #fff;
+  color: var(--color-navy);
+  overflow-x: clip;
+}
+
+/* Type scale from the comp (H2/H3/H4/h5 + body sizes), scaled by --u
+   with floors so it stays legible on phones. */
+@utility t-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: max(36px, calc(90 * var(--u)));
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+@utility t-h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: max(28px, calc(56 * var(--u)));
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+@utility t-h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: max(18px, calc(28 * var(--u)));
+  line-height: 1;
+}
+@utility t-h5 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: max(15px, calc(23 * var(--u)));
+  line-height: 1.2;
+}
+@utility t-body-xl {
+  font-family: var(--font-body);
+  font-size: max(18px, calc(40 * var(--u)));
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+@utility t-body-lg {
+  font-family: var(--font-body);
+  font-size: max(15px, calc(24 * var(--u)));
+  line-height: 1.4;
+}
+@utility t-body {
+  font-family: var(--font-body);
+  font-size: max(14px, calc(20 * var(--u)));
+  line-height: 1.4;
+}
+
+/* Rounded section panel (100px radius in the comp). */
+@utility panel {
+  border-radius: max(32px, calc(100 * var(--u)));
+  overflow: clip;
+}
+
+/* Hide scrollbars on horizontal card rails (mobile). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Scroll-story landing page (src/views/LandingPage.jsx)
+ * Kept from the `aarish` branch. Nothing here overrides a token above; these are
+ * the extra names that page and its components (PublishSection, Icons, the
+ * src/assets/images/*.webp crops) use. The page is not routed at the moment.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* Pinned, scroll-scrubbed layout: from the laptop breakpoint up, motion allowed.
+   LandingPage.jsx uses the identical query in gsap.matchMedia(). */
 @custom-variant story (@media (width >= 1023px) and (prefers-reduced-motion: no-preference));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-script: "Caveat", cursive;
-
-  --color-ink: #0b1b3f;
   --color-sun: #f3cd5a;
   --color-sun-soft: #f3e2a6;
   --color-royal: #0157a9;
@@ -24,39 +165,16 @@
   --color-step-cream: #fff2c9;
   --color-step-lilac: #dbcfff;
 
-  --color-cream: #fdf9f0;
   --color-cream-deep: #ffefca;
   --color-ice: #e2effd;
   --color-ice-deep: #bfdeff;
 
-  /* Breakpoints — ONE scale for the whole app, all min-width.
-     `--breakpoint-*: initial` drops Tailwind's built-in sm/md/lg/xl/2xl first.
-     Without it the defaults stay registered alongside these, so `xl:` (1280) and
-     `desktop:` (1439) both "work" and components silently flip at a different
-     width than the layout. Clearing them makes this list the only scale.
-     tablet-sm (640) and desktop-sm (1280) exist because the old default sm/xl
-     were in real use; they keep those exact thresholds under project names. */
-  --breakpoint-*: initial;
-  --breakpoint-s_phone: 319px;
-  --breakpoint-m_phone: 374px;
-  --breakpoint-phone: 429px;
+  /* Named aliases for the default scale, added (not replacing it) so the
+     landing page's classes resolve while the team's sm/md/lg keep working. */
   --breakpoint-tablet-sm: 640px;
   --breakpoint-tablet: 767px;
   --breakpoint-laptop-sm: 900px;
   --breakpoint-laptop: 1023px;
   --breakpoint-desktop-sm: 1280px;
   --breakpoint-desktop: 1439px;
-  --breakpoint-4k: 1920px;
-}
-
-:root {
-  font-family: var(--font-sans);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  background-color: #ffffff;
 }

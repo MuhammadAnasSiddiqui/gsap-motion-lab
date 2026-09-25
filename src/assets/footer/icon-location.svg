@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame">
+<rect width="50" height="50" rx="25" fill="white"/>
+<g id="Vector">
+<path d="M25 40C31 34 37 28.6274 37 22C37 15.3726 31.6274 10 25 10C18.3726 10 13 15.3726 13 22C13 28.6274 19 34 25 40Z" stroke="#090C24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M25 26.5C27.4854 26.5 29.5 24.4854 29.5 22C29.5 19.5147 27.4854 17.5 25 17.5C22.5147 17.5 20.5 19.5147 20.5 22C20.5 24.4854 22.5147 26.5 25 26.5Z" stroke="#090C24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</svg>

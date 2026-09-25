@@ -4,7 +4,7 @@ A playground for learning and practicing web animation with [GSAP](https://gsap.
 
 ## Purpose
 
-This project is a hands-on space to understand how GSAP works, from the core concepts up. Each experiment focuses on one idea, so it's easy to see what a GSAP feature does, how its options change the result, and how to use it correctly inside a React app.
+This project is a hands-on space to understand how GSAP works, from the core concepts up. Each experiment focuses on one idea, so it's easy to see what a GSAP feature does, how its options change the result, and how to use it correctly inside a React app. It also carries a full build of the Cambridge Book Publishing homepage (see below).
 
 ## How GSAP works
 
@@ -48,7 +48,7 @@ npm install
 npm run dev
 ```
 
-Then open the local URL that Vite prints and edit `src/App.jsx` to start experimenting. The starter animation shows the recommended pattern: `useGSAP()` with a scoped container and a reduced-motion check.
+Then open the local URL that Vite prints. Routing lives in `src/App.jsx`. For a guided read of one animation, start with `src/components/BookShowcase.jsx` and its numbered comments; the full walkthrough and exercises (Roman Urdu) are in [docs/book-showcase.md](docs/book-showcase.md).
 
 ## Scripts
 
@@ -67,3 +67,19 @@ Then open the local URL that Vite prints and edit `src/App.jsx` to start experim
 - [GSAP easing visualizer](https://gsap.com/docs/v3/Eases)
 - [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/)
 - [Tailwind CSS with Vite](https://tailwindcss.com/docs/installation/using-vite)
+
+## Cambridge Book Publishing homepage
+
+Served at `/camblp` (`src/pages/CambridgeHome.jsx`); `/` is the lab index (`src/pages/LabIndex.jsx`), routed in `src/App.jsx` with react-router-dom. The Figma "Website" frame (1920 wide, ~12,600px tall) is built section by section under `src/components/sections/`. Sizes scale from the comp via `--u` (one design pixel, see `src/index.css`), which also defines the type scale (`t-h2`, `t-body`, ...) and the rounded `panel` utility.
+
+Motion lives in each section (GSAP + ScrollTrigger from `src/lib/gsap.js`; generic reveals via `data-reveal` in `src/lib/useReveal.js`). Highlights: hero intro + pointer parallax, count-up stats, step cards settling onto their tilts, a working 4-step quiz, a scroll-scrubbed book tilt, the pinned gallery morph (fan to grid), pin drops, marquee ribbons, genre wipes, a scroll-tweened testimonial rail and an animated FAQ accordion. Everything respects `prefers-reduced-motion`.
+
+Notes:
+- Merculia and Inter Display are commercial; the font stacks list them first so installing Merculia locally picks it up. Otherwise Gabarito, Inter, Lexend, Nunito and Caveat load from Google Fonts.
+- Assets live in `src/assets/<section>/`, straight from Figma and unoptimised (~46MB). Downscale the book covers and step illustrations before shipping.
+- The rotating book (`BookSpin`) is a video in Figma; a single frame is used here.
+- Quiz questions 2-4 and the FAQ answers are placeholder copy; the comp only carries question 1 and the FAQ titles.
+
+## Scroll-story landing page (unwired)
+
+An alternative build of the first five sections (hero, process, stats, publish form, book showcase) as one pinned, scroll-scrubbed GSAP timeline on a 1440 × 780 canvas: `src/views/LandingPage.jsx` with `src/components/{PublishSection,Icons}.jsx` and the cropped art in `src/assets/images/`. No route renders it today — mount `<LandingPage />` in `src/App.jsx` to see it. Its Tailwind tokens and the `story:` variant are at the bottom of `src/index.css`.
