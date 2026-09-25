@@ -23,6 +23,17 @@ const PILL = { width: 44, height: 185, radius: 80, padding: 24, gap: 8, label: 1
 // to from the hero, so it only appears once the hero hands over.
 const BACK = { size: 60, left: 70, top: 33 }
 
+// Elements whose own keyboard behaviour wins over page stepping. Space belongs
+// to the focused control, so this list is checked before any key is swallowed.
+const INTERACTIVE =
+  'a, button, input, textarea, select, summary, [contenteditable], [tabindex], [role="button"], [role="radio"], [role="tab"]'
+
+// Containers that scroll on their own axis and must keep their wheel/touch
+// gestures — the horizontal card rails.
+const NATIVE_SCROLL = '.no-scrollbar, [data-native-scroll]'
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const TapToScroll = () => {
   const animating = useRef(false)
   // Two ladders: the wheel walks every stop, including the ones inside a tall
@@ -125,6 +136,13 @@ const TapToScroll = () => {
         : [...ladder.current].reverse().find((s) => s < y - 4)
     if (next == null) return
 
+    // Someone who asked for less movement still gets to move between sections —
+    // they just arrive instead of gliding.
+    if (reducedMotion()) {
+      window.scrollTo({ top: next, behavior: 'auto' })
+      return
+    }
+
     animating.current = true
     gsap.to(window, {
       scrollTo: { y: next, autoKill: false },
@@ -137,27 +155,64 @@ const TapToScroll = () => {
   }, [])
 
   useGSAP(() => {
-    // Hijacking the wheel is exactly what reduced-motion users opt out of, so
-    // they keep the browser's own scrolling.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
+    // The ladders are measurements, not motion, and the two buttons need them
+    // whatever the motion preference — so they are built before the guard below.
     measure()
     ScrollTrigger.addEventListener('refresh', measure)
+
+    // The disc only belongs on screen once the hero has handed over. Set here
+    // rather than in the tween, so it stays hidden when the tween is skipped.
+    gsap.set(backRef.current, { autoAlpha: 0 })
+
+    const cleanup = () => {
+      ScrollTrigger.removeEventListener('refresh', measure)
+    }
+
+    // Hijacking the wheel is exactly what reduced-motion users opt out of, so
+    // they keep the browser's own scrolling. The disc still has to appear once
+    // the hero is behind them, so it toggles on the same boundary — instantly,
+    // with no tween, which is the point.
+    if (reducedMotion()) {
+      const heroSection = document.querySelector('[data-hero]')
+      if (heroSection) {
+        const toggle = (shown) => gsap.set(backRef.current, { autoAlpha: shown ? 1 : 0 })
+        // exitRange is the same hand-over boundary the scrubbed version fades
+        // across — as scroll positions, so a hero shorter than the screen does
+        // not count as already passed at scroll 0.
+        const { start, end } = exitRange(heroSection)
+        ScrollTrigger.create({
+          trigger: heroSection,
+          start,
+          end,
+          invalidateOnRefresh: true,
+          onEnter: () => toggle(true),
+          onLeaveBack: () => toggle(false),
+        })
+      }
+      return cleanup
+    }
 
     Observer.create({
       type: 'wheel,touch',
       wheelSpeed: -1,
       tolerance: 10,
       preventDefault: true,
+      allowClicks: true,
+      // Anything that scrolls on its own axis keeps its gesture: the card rails
+      // are `overflow-x-auto`, and taking their wheel/touch events made the
+      // cards past the third unreachable by any input.
+      ignore: NATIVE_SCROLL,
       onUp: () => step(1),
       onDown: () => step(-1),
     })
 
     const onKey = (e) => {
-      const tag = e.target?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return
+      // Only drive the page when the key is not meant for the focused control.
+      // Space in particular activates a button, so taking it here left the FAQ
+      // toggles, the quiz options and Next/Back reachable by Enter only.
+      if (e.target?.closest?.(INTERACTIVE)) return
 
-      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault()
         step(1)
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
@@ -186,7 +241,7 @@ const TapToScroll = () => {
     }
 
     return () => {
-      ScrollTrigger.removeEventListener('refresh', measure)
+      cleanup()
       window.removeEventListener('keydown', onKey)
     }
   })
@@ -230,6 +285,7 @@ const TapToScroll = () => {
       >
         <button
           type="button"
+          aria-label="Next section"
           onClick={() => step(1, sectionStops)}
           className="pointer-events-auto flex flex-col items-center justify-center bg-white text-ink opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
           style={{
