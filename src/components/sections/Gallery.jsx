@@ -77,7 +77,7 @@ function Gallery() {
 
   return (
     <section ref={container} data-scroll-stops="2" className="px-(--pad) py-(--pad)">
-      <div className="gal-stage relative lg:motion-safe:aspect-[1918/925]">
+      <div className="gal-stage relative laptop:motion-safe:aspect-[1918/925]">
         {/* Blue panel with the diagonal brush stroke */}
         <div className="gal-panel panel absolute inset-0 bg-sky" aria-hidden="true">
           <img
@@ -87,22 +87,22 @@ function Gallery() {
           />
         </div>
 
-        <div className="gal-head relative px-(--gutter) pt-[max(40px,calc(140*var(--u)))] text-center lg:px-[calc(220*var(--u))]">
-          <h2 className="t-h3 text-accent [overflow-wrap:anywhere] max-sm:text-[24px]">#MadewithCambridgebookpublic</h2>
+        <div className="gal-head relative px-(--gutter) pt-[max(40px,calc(140*var(--u)))] text-center laptop:px-[calc(220*var(--u))]">
+          <h2 className="t-h3 text-accent [overflow-wrap:anywhere] max-tablet-sm:text-[24px]">#MadewithCambridgebookpublic</h2>
           <p className="t-body mt-[max(8px,calc(12*var(--u)))] text-muted">
             Edited, designed, and published – every title here is proof of what we do.
           </p>
         </div>
 
         {/* Books: absolute fan on desktop, horizontal rail otherwise */}
-        <ul className="no-scrollbar relative mt-8 flex gap-4 overflow-x-auto px-(--gutter) pb-10 lg:motion-safe:absolute lg:motion-safe:inset-0 lg:motion-safe:m-0 lg:motion-safe:block lg:motion-safe:overflow-visible lg:motion-safe:p-0">
+        <ul className="no-scrollbar relative mt-8 flex gap-4 overflow-x-auto px-(--gutter) pb-10 laptop:motion-safe:absolute laptop:motion-safe:inset-0 laptop:motion-safe:m-0 laptop:motion-safe:block laptop:motion-safe:overflow-visible laptop:motion-safe:p-0">
           {BOOKS.map((book, i) => (
             <li
               key={i}
-              className="w-[150px] shrink-0 lg:motion-safe:absolute lg:motion-safe:w-[12.66%] lg:motion-safe:-translate-x-1/2 lg:motion-safe:-translate-y-1/2"
+              className="w-[150px] shrink-0 laptop:motion-safe:absolute laptop:motion-safe:w-[12.66%] laptop:motion-safe:-translate-x-1/2 laptop:motion-safe:-translate-y-1/2"
               style={{ left: pct(book.fan.x, STAGE.w), top: pct(book.fan.y, STAGE.h) }}
             >
-              <div className="gal-book-inner lg:motion-safe:rotate-(--r)" style={{ "--r": `${book.fan.r}deg` }}>
+              <div className="gal-book-inner laptop:motion-safe:rotate-(--r)" style={{ "--r": `${book.fan.r}deg` }}>
                 <img
                   src={book.src}
                   alt={book.alt}
@@ -114,11 +114,11 @@ function Gallery() {
         </ul>
 
         {/* Copy block for the second state */}
-        <div className="gal-copy relative flex flex-col gap-[max(16px,calc(24*var(--u)))] px-(--gutter) pb-10 lg:motion-safe:absolute lg:motion-safe:top-[48.7%] lg:motion-safe:left-[5.68%] lg:motion-safe:w-[46%] lg:motion-safe:-translate-y-1/2 lg:motion-safe:px-0 lg:motion-safe:pb-0">
+        <div className="gal-copy relative flex flex-col gap-[max(16px,calc(24*var(--u)))] px-(--gutter) pb-10 laptop:motion-safe:absolute laptop:motion-safe:top-[48.7%] laptop:motion-safe:left-[5.68%] laptop:motion-safe:w-[46%] laptop:motion-safe:-translate-y-1/2 laptop:motion-safe:px-0 laptop:motion-safe:pb-0">
           <h2 className="t-h2 text-navy">
             You bring the story.<br />We bring the expertise.
           </h2>
-          <ul className="flex flex-col gap-[max(16px,calc(32*var(--u)))] lg:w-[92%]">
+          <ul className="flex flex-col gap-[max(16px,calc(32*var(--u)))] laptop:w-[92%]">
             {POINTS.map((p) => (
               <li key={p.title}>
                 <p className="t-h4 text-accent">{p.title}</p>

@@ -131,7 +131,7 @@ function PublishForm() {
   }
 
   return (
-    <section ref={container} className="flex flex-col gap-10 px-(--gutter) py-(--pad) lg:flex-row lg:items-center lg:gap-[calc(80*var(--u))]">
+    <section ref={container} className="flex flex-col gap-10 px-(--gutter) py-(--pad) laptop:flex-row laptop:items-center laptop:gap-[calc(80*var(--u))]">
       {/* Intro + contact details */}
       <div className="flex flex-1 flex-col gap-[max(32px,calc(60*var(--u)))]">
         <div className="flex flex-col gap-[max(6px,calc(8*var(--u)))]" data-reveal>
@@ -171,7 +171,7 @@ function PublishForm() {
 
       {/* Quiz card */}
       <div
-        className="relative flex flex-1 flex-col justify-between gap-8 overflow-clip rounded-[max(24px,calc(48*var(--u)))] bg-white px-[max(20px,calc(56*var(--u)))] py-[max(24px,calc(48*var(--u)))] lg:min-h-[calc(819*var(--u))]"
+        className="relative flex flex-1 flex-col justify-between gap-8 overflow-clip rounded-[max(24px,calc(48*var(--u)))] bg-white px-[max(20px,calc(56*var(--u)))] py-[max(24px,calc(48*var(--u)))] laptop:min-h-[calc(819*var(--u))]"
         data-reveal
         data-reveal-delay="0.1"
       >

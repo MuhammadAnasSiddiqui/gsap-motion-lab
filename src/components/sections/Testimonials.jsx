@@ -64,7 +64,7 @@ function Byline({ name, date, avatar, light = false }) {
 
 function ReviewCard({ card }) {
   return (
-    <article className="flex h-full w-[85vw] max-w-[560px] shrink-0 snap-start overflow-clip rounded-[max(16px,calc(24*var(--u)))] border-[3px] border-border bg-white lg:w-[calc(725*var(--u))] lg:max-w-none">
+    <article className="flex h-full w-[85vw] max-w-[560px] shrink-0 snap-start overflow-clip rounded-[max(16px,calc(24*var(--u)))] border-[3px] border-border bg-white laptop:w-[calc(725*var(--u))] laptop:max-w-none">
       <div className="flex flex-1 flex-col justify-center gap-[max(14px,calc(24*var(--u)))] px-[max(16px,calc(24*var(--u)))] py-[max(16px,calc(24*var(--u)))]">
         <img src={stars} alt="Five stars" className="w-[max(90px,calc(120*var(--u)))]" />
         <div className="flex flex-col gap-[calc(10*var(--u))]">
@@ -79,7 +79,7 @@ function ReviewCard({ card }) {
           <img src={trustpilot} alt="Trustpilot" className="w-[max(64px,calc(81*var(--u)))]" />
         </div>
       </div>
-      <div className="hidden p-1.5 sm:block">
+      <div className="hidden p-1.5 tablet-sm:block">
         <img src={card.book} alt={card.bookAlt} className="h-full w-[max(140px,calc(264*var(--u)))] rounded-[max(16px,calc(24*var(--u)))] object-cover" />
       </div>
     </article>

@@ -143,20 +143,15 @@
    is picked up. To self-host them once licensed, drop the files in
    public/fonts/ and add a rule in the same shape as those above. */
 
-/* Pinned, scroll-scrubbed layout used by the scroll-story landing page
-   (src/views/LandingPage.jsx): Tailwind's `lg` width and up, motion allowed.
-   LandingPage.jsx passes the identical query to gsap.matchMedia(), so the CSS
-   layout and the GSAP timeline switch on and off together. */
-@custom-variant story (@media (width >= 64rem) and (prefers-reduced-motion: no-preference));
-@theme {
-  /* ── Design tokens ───────────────────────────────────────────────────────────
+/* ── Design tokens ───────────────────────────────────────────────────────────
    One @theme for the whole app. Values come from the Figma comp. Each colour
    is defined once; where two names are genuinely the same thing, the second
    points at the first with var() rather than repeating the hex, so there is one
-   place to change it. Breakpoints are Tailwind's defaults (sm/md/lg/xl/2xl) —
-   no second scale.
+   place to change it. Breakpoints are the project scale below — components use
+   `tablet-sm:` / `laptop:` / `desktop:`, never Tailwind's `sm:` / `lg:` / `xl:`,
+   which this file removes.
    ──────────────────────────────────────────────────────────────────────────── */
-
+@theme {
   /* Breakpoints — ONE scale for the whole app, all min-width.
      `--breakpoint-*: initial` drops Tailwind's built-in sm/md/lg/xl/2xl first.
      Without it the defaults stay registered alongside these, so `xl:` (1280) and

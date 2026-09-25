@@ -43,11 +43,11 @@ function WhyChoose() {
         />
         <h2 className="t-h2 relative text-center text-navy" data-reveal>Why Choose Us</h2>
 
-        <ul className="why-cards no-scrollbar relative flex w-full gap-4 overflow-x-auto px-(--gutter) pt-10 pb-4 lg:justify-center lg:gap-[calc(32*var(--u))] lg:overflow-visible lg:px-0">
+        <ul className="why-cards no-scrollbar relative flex w-full gap-4 overflow-x-auto px-(--gutter) pt-10 pb-4 laptop:justify-center laptop:gap-[calc(32*var(--u))] laptop:overflow-visible laptop:px-0">
           {CARDS.map((card) => (
             <li
               key={card.title}
-              className={`why-card w-[220px] shrink-0 lg:w-[calc(298*var(--u))] ${card.offset ? 'lg:mt-[calc(77*var(--u))]' : ''}`}
+              className={`why-card w-[220px] shrink-0 laptop:w-[calc(298*var(--u))] ${card.offset ? 'laptop:mt-[calc(77*var(--u))]' : ''}`}
             >
               <div className="relative flex flex-col items-center rounded-[max(20px,calc(32*var(--u)))] bg-white px-[max(10px,calc(14*var(--u)))] pt-[max(48px,calc(70*var(--u)))] pb-[max(10px,calc(14*var(--u)))] transition-transform duration-300 ease-out hover:-translate-y-2">
                 <img

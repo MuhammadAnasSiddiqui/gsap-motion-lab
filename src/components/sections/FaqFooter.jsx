@@ -104,7 +104,7 @@ function FaqFooter() {
     <div ref={container} className="flex flex-col gap-[calc(10*var(--u))] bg-[linear-gradient(to_top,#050a1d_40%,#fff)] px-(--pad) pb-(--pad)">
       {/* FAQ */}
       <section className="pt-(--pad)">
-        <div className="panel relative flex flex-col items-center gap-[max(20px,calc(32*var(--u)))] bg-sky px-(--gutter) pt-[max(48px,calc(100*var(--u)))] pb-[max(200px,calc(560*var(--u)))] lg:px-[calc(260*var(--u))]">
+        <div className="panel relative flex flex-col items-center gap-[max(20px,calc(32*var(--u)))] bg-sky px-(--gutter) pt-[max(48px,calc(100*var(--u)))] pb-[max(200px,calc(560*var(--u)))] laptop:px-[calc(260*var(--u))]">
           <img
             src={brush}
             alt=""
@@ -125,8 +125,8 @@ function FaqFooter() {
 
       {/* Footer */}
       <footer className="relative">
-        <div className="footer-grid relative flex flex-col gap-12 px-(--gutter) pt-[max(24px,calc(30*var(--u)))] pb-[max(60px,calc(150*var(--u)))] lg:flex-row lg:justify-between">
-          <div className="flex flex-col lg:max-w-[calc(470*var(--u))] gap-[max(28px,calc(48*var(--u)))]">
+        <div className="footer-grid relative flex flex-col gap-12 px-(--gutter) pt-[max(24px,calc(30*var(--u)))] pb-[max(60px,calc(150*var(--u)))] laptop:flex-row laptop:justify-between">
+          <div className="flex flex-col laptop:max-w-[calc(470*var(--u))] gap-[max(28px,calc(48*var(--u)))]">
             <img src={logoWhite} alt="Cambridge Book Publishing" className="w-[max(180px,calc(263*var(--u)))]" />
             <p className="t-body-lg text-white">
               Our UK-based team of editors, designers, marketers, and publishing consultants brings professional expertise to every author we work with, regardless of genre.
@@ -148,7 +148,7 @@ function FaqFooter() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-[max(28px,calc(48*var(--u)))] lg:w-[calc(480*var(--u))] lg:pl-[calc(76*var(--u))]">
+          <div className="flex flex-col gap-[max(28px,calc(48*var(--u)))] laptop:w-[calc(480*var(--u))] laptop:pl-[calc(76*var(--u))]">
             <div className="flex flex-col gap-[max(14px,calc(24*var(--u)))]">
               <p className="t-h4 text-white">Quick Links</p>
               <ul className="flex flex-wrap gap-[max(8px,calc(12*var(--u)))]">
@@ -184,11 +184,11 @@ function FaqFooter() {
           <img
             src={bookGlow}
             alt="How to Publish Your Book, a Cambridge Book Publishing hardcover"
-            className="footer-book pointer-events-none absolute top-[calc(-267*var(--u))] left-[18.5%] hidden w-[56%] max-w-none rotate-[4.54deg] drop-shadow-[0_25px_120px_rgba(19,35,94,0.4)] lg:block"
+            className="footer-book pointer-events-none absolute top-[calc(-267*var(--u))] left-[18.5%] hidden w-[56%] max-w-none rotate-[4.54deg] drop-shadow-[0_25px_120px_rgba(19,35,94,0.4)] laptop:block"
           />
         </div>
 
-        <div className="flex flex-col gap-3 rounded-[max(20px,calc(140*var(--u)))] bg-sky px-[max(20px,calc(60*var(--u)))] py-[max(12px,calc(16*var(--u)))] font-lexend text-[max(13px,calc(18*var(--u)))] leading-[1.4] text-[#04032c] sm:flex-row sm:items-center sm:justify-between lg:h-[calc(75*var(--u))]">
+        <div className="flex flex-col gap-3 rounded-[max(20px,calc(140*var(--u)))] bg-sky px-[max(20px,calc(60*var(--u)))] py-[max(12px,calc(16*var(--u)))] font-lexend text-[max(13px,calc(18*var(--u)))] leading-[1.4] text-[#04032c] tablet-sm:flex-row tablet-sm:items-center tablet-sm:justify-between laptop:h-[calc(75*var(--u))]">
           <p>All right reserved cambridge</p>
           <div className="flex gap-[max(16px,calc(32*var(--u)))] whitespace-nowrap">
             <a href="#" className="hover:underline">Privacy Policy</a>

@@ -41,7 +41,7 @@ function Banners() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative aspect-[1920/468] w-full overflow-clip bg-white max-lg:min-h-[220px]" aria-label="Offers">
+    <section ref={container} className="relative aspect-[1920/468] w-full overflow-clip bg-white max-laptop:min-h-[220px]" aria-label="Offers">
       {RIBBONS.map((ribbon) => (
         <div
           key={ribbon.text}

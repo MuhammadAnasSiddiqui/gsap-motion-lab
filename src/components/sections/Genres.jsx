@@ -46,7 +46,7 @@ function Genres() {
 
   return (
     <section ref={container} className="px-(--pad) py-(--pad)">
-      <div className="panel relative flex flex-col items-center justify-center bg-[#ffd982] px-(--gutter) py-[max(48px,calc(100*var(--u)))] lg:min-h-[calc(1080*var(--u))]">
+      <div className="panel relative flex flex-col items-center justify-center bg-[#ffd982] px-(--gutter) py-[max(48px,calc(100*var(--u)))] laptop:min-h-[calc(1080*var(--u))]">
         <img
           src={brush}
           alt=""

@@ -32,12 +32,12 @@ function AuthorStories() {
   const replay = () => reveal.current?.restart()
 
   return (
-    <section ref={container} className="flex flex-col items-center gap-[max(20px,calc(32*var(--u)))] px-(--pad) pt-[max(60px,calc(180*var(--u)))] pb-[max(48px,calc(100*var(--u)))] lg:px-[calc(150*var(--u))]">
+    <section ref={container} className="flex flex-col items-center gap-[max(20px,calc(32*var(--u)))] px-(--pad) pt-[max(60px,calc(180*var(--u)))] pb-[max(48px,calc(100*var(--u)))] laptop:px-[calc(150*var(--u))]">
       <h2 className="t-h2 text-navy" data-reveal>Author Stories</h2>
 
       <div className="story-card w-full overflow-clip rounded-[max(28px,calc(90*var(--u)))] bg-navy">
         <p className="t-h4 px-6 py-[max(16px,calc(24*var(--u)))] text-center text-white">From Personal Story to Bestseller</p>
-        <div className="flex flex-col items-center gap-10 rounded-[max(28px,calc(90*var(--u)))] bg-[#ecf2f9] px-(--gutter) py-[max(32px,calc(60*var(--u)))] lg:flex-row lg:justify-between lg:px-[calc(120*var(--u))]">
+        <div className="flex flex-col items-center gap-10 rounded-[max(28px,calc(90*var(--u)))] bg-[#ecf2f9] px-(--gutter) py-[max(32px,calc(60*var(--u)))] laptop:flex-row laptop:justify-between laptop:px-[calc(120*var(--u))]">
           <div className="flex items-center gap-[max(12px,calc(30*var(--u)))] [perspective:1200px]">
             <figure className="story-before flex flex-col items-center gap-[calc(15*var(--u))]">
               <figcaption className="font-serif text-[max(14px,calc(19.5*var(--u)))] leading-[1.2] font-black tracking-[-0.05em] text-navy">Before</figcaption>
@@ -56,7 +56,7 @@ function AuthorStories() {
             </figure>
           </div>
 
-          <blockquote className="story-quote flex flex-col gap-[max(16px,calc(24*var(--u)))] lg:w-[calc(545*var(--u))]">
+          <blockquote className="story-quote flex flex-col gap-[max(16px,calc(24*var(--u)))] laptop:w-[calc(545*var(--u))]">
             <p className="t-h5 text-muted">
               Hi I'm the author of Chrissy the poodle gets adopted and I use the publisher Cambridge and I was very satisfied and I'm going to use it for my sequel so thank you so much Cambridge book publishing and we'll talk to you soon.
             </p>
