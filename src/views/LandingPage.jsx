@@ -38,9 +38,9 @@ gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollToPlugin);
  * as a normal stacked page with simple fade-ups, and with reduced motion there's no animation.
  */
 
-// Must match the `story` custom variant in src/index.css (the `laptop` breakpoint, 1023px).
-const STORY_QUERY = "(min-width: 1023px) and (prefers-reduced-motion: no-preference)";
-const SIMPLE_QUERY = "(max-width: 1022.98px) and (prefers-reduced-motion: no-preference)";
+// Must match the `story` custom variant in src/index.css (Tailwind lg, 64rem).
+const STORY_QUERY = "(min-width: 64rem) and (prefers-reduced-motion: no-preference)";
+const SIMPLE_QUERY = "(max-width: 63.99rem) and (prefers-reduced-motion: no-preference)";
 
 const STORY_TRIGGER_ID = "landing-story";
 

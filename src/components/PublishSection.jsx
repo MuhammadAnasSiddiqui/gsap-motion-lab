@@ -41,10 +41,10 @@ export default function PublishSection() {
       id="publish"
       className="scene scene-publish relative bg-white px-5 py-20 story:absolute story:inset-0 story:z-30 story:p-0"
     >
-      <div className="relative mx-auto grid max-w-360 gap-12 laptop:grid-cols-2 laptop:items-center story:block story:h-full">
+      <div className="relative mx-auto grid max-w-360 gap-12 lg:grid-cols-2 lg:items-center story:block story:h-full">
         <div className="publish-copy reveal story:absolute story:top-49 story:left-13 story:w-155">
           <h2 className="font-display text-4xl leading-[1.1] font-bold tracking-tight text-ink story:text-[44px]">
-            Ready to Turn Manuscript <br className="hidden tablet-sm:block" />
+            Ready to Turn Manuscript <br className="hidden sm:block" />
             Into a{" "}
             <span className="relative inline-block">
               Published eBook?
@@ -52,7 +52,7 @@ export default function PublishSection() {
                 aria-hidden="true"
                 viewBox="0 0 300 12"
                 preserveAspectRatio="none"
-                className="absolute -bottom-2 left-0 h-3 w-[92%] text-royal"
+                className="absolute -bottom-2 left-0 h-3 w-[92%] text-accent"
               >
                 <path
                   d="M2 9C80 2 190 1 298 7"
@@ -64,7 +64,7 @@ export default function PublishSection() {
               </svg>
             </span>
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink/85 tablet-sm:text-2xl story:mt-2.5 story:text-[30px] story:leading-[1.38]">
+          <p className="mt-4 text-lg leading-relaxed text-ink/85 sm:text-2xl story:mt-2.5 story:text-[30px] story:leading-[1.38]">
             Tell us a little about your book and publishing goals. Our team will review your
             project.
           </p>
@@ -72,7 +72,7 @@ export default function PublishSection() {
           <ul className="mt-10 space-y-7 story:mt-12 story:space-y-7.5">
             {CONTACTS.map(({ label, value, Icon }) => (
               <li key={label} className="flex items-start gap-4 story:gap-4.5">
-                <span className="mt-1 grid size-9.5 shrink-0 place-items-center rounded-lg bg-[#dce9fb] text-royal">
+                <span className="mt-1 grid size-9.5 shrink-0 place-items-center rounded-lg bg-[#dce9fb] text-accent">
                   <Icon className="size-5" />
                 </span>
                 <span>
@@ -88,9 +88,9 @@ export default function PublishSection() {
 
         <form
           onSubmit={(event) => event.preventDefault()}
-          className="publish-card reveal relative overflow-hidden rounded-[36px] bg-linear-to-b from-[#d3e7ff] via-[#e3f0ff] to-[#d9eaff] p-6 text-ink tablet-sm:p-10 story:absolute story:top-26.5 story:left-177.25 story:h-160 story:w-169.5 story:px-10 story:py-8.5"
+          className="publish-card reveal relative overflow-hidden rounded-[36px] bg-linear-to-b from-[#d3e7ff] via-[#e3f0ff] to-[#d9eaff] p-6 text-ink sm:p-10 story:absolute story:top-26.5 story:left-177.25 story:h-160 story:w-169.5 story:px-10 story:py-8.5"
         >
-          <h3 className="font-display text-3xl leading-tight font-bold tracking-tight tablet-sm:text-[42px]">
+          <h3 className="font-display text-3xl leading-tight font-bold tracking-tight sm:text-[42px]">
             Publish Your Book
           </h3>
           <p className="mt-2 text-[15px] leading-snug text-ink/85">
@@ -102,7 +102,7 @@ export default function PublishSection() {
             {[0, 1, 2, 3].map((bar) => (
               <span
                 key={bar}
-                className={`h-2 rounded-full ${bar === 0 ? "bg-sun" : "bg-sun-soft"}`}
+                className={`h-2 rounded-full ${bar === 0 ? "bg-gold" : "bg-gold-light"}`}
               />
             ))}
           </div>
@@ -125,9 +125,9 @@ export default function PublishSection() {
                 return (
                   <label
                     key={id}
-                    className={`flex min-h-16.5 cursor-pointer items-center gap-3 rounded-[22px] border px-4 py-2 tablet-sm:gap-5 tablet-sm:px-6 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-royal ${
+                    className={`flex min-h-16.5 cursor-pointer items-center gap-3 rounded-[22px] border px-4 py-2 sm:gap-5 sm:px-6 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${
                       selected
-                        ? "border-royal bg-royal text-white shadow-[0_10px_24px_-12px_rgb(1_87_169/0.8)]"
+                        ? "border-accent bg-accent text-white shadow-[0_10px_24px_-12px_rgb(1_87_169/0.8)]"
                         : "border-white bg-white/85 text-ink hover:bg-white"
                     }`}
                   >
@@ -139,7 +139,9 @@ export default function PublishSection() {
                       onChange={() => setStage(id)}
                       className="sr-only"
                     />
-                    <Icon className={`size-9 shrink-0 ${selected ? "text-white" : "text-royal"}`} />
+                    <Icon
+                      className={`size-9 shrink-0 ${selected ? "text-white" : "text-accent"}`}
+                    />
                     <span className="grow">
                       <span className="block font-display text-[19px] leading-tight font-semibold">
                         {title}
@@ -150,8 +152,8 @@ export default function PublishSection() {
                     </span>
                     <span
                       aria-hidden="true"
-                      className={`grid size-6.5 shrink-0 place-items-center rounded-full border-[3px] border-sun ${
-                        selected ? "bg-sun" : ""
+                      className={`grid size-6.5 shrink-0 place-items-center rounded-full border-[3px] border-gold ${
+                        selected ? "bg-gold" : ""
                       }`}
                     >
                       {selected && <span className="size-2.5 rounded-full bg-white" />}
@@ -175,7 +177,7 @@ export default function PublishSection() {
             </button>
             <button
               type="submit"
-              className="flex h-11 cursor-pointer items-center gap-2 rounded-full bg-sun pr-1.5 pl-5 font-display font-semibold text-ink hover:bg-[#f6d673] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-royal"
+              className="flex h-11 cursor-pointer items-center gap-2 rounded-full bg-gold pr-1.5 pl-5 font-display font-semibold text-ink hover:bg-[#f6d673] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
               Next
               <span className="grid size-8 place-items-center rounded-full bg-white">

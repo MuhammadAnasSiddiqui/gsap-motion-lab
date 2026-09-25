@@ -1,66 +1,220 @@
 @import "tailwindcss";
 
-/* Optional licensed fonts; the theme fallbacks apply until files are supplied. */
+/* ── Self-hosted fonts ───────────────────────────────────────────────────────
+   The woff2 files live in public/fonts/ and ship with the build, instead of
+   being fetched from Google at runtime: no DNS/TLS round trips to a third party
+   before text paints, no visitor IP sent to Google (a GDPR issue in the EU),
+   and the faces stay byte-identical until someone replaces them on purpose.
+
+   Each family is ONE upright variable file per subset, covering its whole
+   weight range, so font-medium through font-black come from the same download.
+   The unicode-range on each rule means a visitor only fetches the subsets the
+   page needs — latin alone is ~48KB Inter, ~36KB Gabarito, ~40KB Lexend,
+   ~39KB Nunito, ~75KB Caveat; latin-ext is only pulled in for accented text.
+
+   The hero's two faces (Inter, Gabarito) are preloaded in index.html. That
+   works because these paths are stable — files in public/ are served as-is and
+   are not fingerprinted, so set a long max-age at the CDN and change the file
+   name when you update a font.
+
+   Source: Fontsource v5.3.0 (@fontsource-variable/<family>). To refresh:
+   npm i -D @fontsource-variable/inter && copy the latin/latin-ext woff2 files
+   from node_modules/@fontsource-variable/<family>/files/ into public/fonts/.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Inter Variable 5.3.0 — latin + latin-ext, weights 100 900 */
 @font-face {
-  font-family: "Merculia";
-  src:
-    url("/fonts/Merculia.woff2") format("woff2"),
-    url("/fonts/Merculia.otf") format("opentype");
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
   font-weight: 100 900;
+  src: url(/fonts/inter-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Inter Variable";
   font-style: normal;
   font-display: swap;
-}
-
-@font-face {
-  font-family: "Inter Display";
-  src: url("/fonts/InterDisplay.woff2") format("woff2");
   font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
+  src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Gabarito Variable 5.3.0 — latin + latin-ext, weights 400 900 */
 @font-face {
-  font-family: "Rentan Yena";
-  src: url("/fonts/RentanYena.woff2") format("woff2");
-  font-weight: 400;
+  font-family: "Gabarito Variable";
   font-style: normal;
   font-display: swap;
+  font-weight: 400 900;
+  src: url(/fonts/gabarito-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
 }
-
 @font-face {
-  font-family: "Bringbold Nineties";
-  src: url("/fonts/BringboldNineties.woff2") format("woff2");
-  font-weight: 400;
+  font-family: "Gabarito Variable";
   font-style: normal;
   font-display: swap;
+  font-weight: 400 900;
+  src: url(/fonts/gabarito-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Lexend Variable 5.3.0 — latin + latin-ext, weights 100 900 */
+@font-face {
+  font-family: "Lexend Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(/fonts/lexend-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Lexend Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(/fonts/lexend-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Nunito Variable 5.3.0 — latin + latin-ext, weights 200 1000 */
+@font-face {
+  font-family: "Nunito Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 1000;
+  src: url(/fonts/nunito-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Nunito Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 1000;
+  src: url(/fonts/nunito-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Caveat Variable 5.3.0 — latin + latin-ext, weights 400 700 */
+@font-face {
+  font-family: "Caveat Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url(/fonts/caveat-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Caveat Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url(/fonts/caveat-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Merculia, Inter Display, Rentan Yena and Bringbold Nineties are commercial
+   faces that aren't in the repo, so they have no @font-face rule. They are
+   still first in the stacks below, so a copy installed on the visitor's machine
+   is picked up. To self-host them once licensed, drop the files in
+   public/fonts/ and add a rule in the same shape as those above. */
+
+/* Pinned, scroll-scrubbed layout used by the scroll-story landing page
+   (src/views/LandingPage.jsx): Tailwind's `lg` width and up, motion allowed.
+   LandingPage.jsx passes the identical query to gsap.matchMedia(), so the CSS
+   layout and the GSAP timeline switch on and off together. */
+@custom-variant story (@media (width >= 64rem) and (prefers-reduced-motion: no-preference));
 @theme {
-  /* Cambridge Book Publishing — tokens from the Figma comp */
-  --color-navy: #081a3a;
-  --color-ink: #090c24;
-  --color-gold: #f3cd5a;
-  --color-gold-light: #f7d76d;
+  /* ── Design tokens ───────────────────────────────────────────────────────────
+   One @theme for the whole app. Values come from the Figma comp. Each colour
+   is defined once; where two names are genuinely the same thing, the second
+   points at the first with var() rather than repeating the hex, so there is one
+   place to change it. Breakpoints are Tailwind's defaults (sm/md/lg/xl/2xl) —
+   no second scale.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+  /* Breakpoints — ONE scale for the whole app, all min-width.
+     `--breakpoint-*: initial` drops Tailwind's built-in sm/md/lg/xl/2xl first.
+     Without it the defaults stay registered alongside these, so `xl:` (1280) and
+     `desktop:` (1439) both "work" and components silently flip at a different
+     width than the layout. Clearing them makes this list the only scale.
+     tablet-sm (640) and desktop-sm (1280) exist because the old default sm/xl
+     were in real use; they keep those exact thresholds under project names. */
+  --breakpoint-*: initial;
+  --breakpoint-s_phone: 319px;
+  --breakpoint-m_phone: 374px;
+  --breakpoint-phone: 429px;
+  --breakpoint-tablet-sm: 640px;
+  --breakpoint-tablet: 767px;
+  --breakpoint-laptop-sm: 900px;
+  --breakpoint-laptop: 1023px;
+  --breakpoint-desktop-sm: 1280px;
+  --breakpoint-desktop: 1439px;
+  --breakpoint-4k: 1920px;
+
+  /* Brand */
+  --color-navy: #081a3a; /* body text, dark panels */
+  --color-ink: #090c24; /* headings, near-black */
+  --color-muted: #4a5468; /* secondary copy */
+  --color-border: #cbdce9;
+
+  --color-gold: #f3cd5a; /* CTA fill, highlights */
+  --color-gold-light: #f7d76d; /* CTA hover, inactive progress bars */
+  --color-accent: #004a91; /* links, selected rows */
+  --color-accent-bright: #006cd8;
+
+  /* Section tints: the pale backgrounds behind cards and panels.
+     Each `-deep` is the stronger blob shape drawn on top of its base. */
   --color-sky: #d2e6fc;
   --color-sky-soft: #e8eff8;
-  --color-muted: #4a5468;
-  --color-accent: #004a91;
-  --color-accent-bright: #006cd8;
   --color-cream: #fdf9f0;
+  --color-cream-deep: #ffefca;
   --color-frost: #e2effd;
-  --color-border: #cbdce9;
-  --color-cta: #f3cd5a;
+  --color-frost-deep: #bfdeff;
 
-  /* Merculia / Inter Display are commercial faces; the Google Fonts fallbacks
-     are the closest free matches (Gabarito was measured nearest in width). */
-  --font-display: "Merculia", "Gabarito", system-ui, sans-serif;
-  --font-body: "Inter Display", "Inter", system-ui, sans-serif;
-  --font-script: "Springlake", "Rentan Yena", "Caveat", cursive;
-  --font-lexend: "Lexend", "Inter", system-ui, sans-serif;
-  --font-nunito: "Nunito", "Inter", system-ui, sans-serif;
-  --font-heading: "Merculia", "Gabarito", system-ui, sans-serif;
-  --font-hand: "Rentan Yena", Caveat, cursive;
-  --font-nav: "Bringbold Nineties", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  /* Role alias — same colour as --color-gold, kept because `bg-cta` reads
+     better than `bg-gold` at the call site. */
+  --color-cta: var(--color-gold);
+
+  /* Fonts. Merculia and Inter Display are commercial; the free faces after
+     them are the closest matches (Gabarito was measured nearest in width).
+     The "* Variable" names are the self-hosted files above; the plain names
+     after them catch a copy installed on the visitor's machine. */
+  --font-display: "Merculia", "Gabarito Variable", "Gabarito", system-ui, sans-serif;
+  --font-body: "Inter Display", "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-script: "Springlake", "Rentan Yena", "Caveat Variable", "Caveat", cursive;
+  --font-lexend: "Lexend Variable", "Lexend", "Inter Variable", system-ui, sans-serif;
+  --font-nunito: "Nunito Variable", "Nunito", "Inter Variable", system-ui, sans-serif;
+  --font-nav:
+    "Bringbold Nineties", "Plus Jakarta Sans", "Inter Variable", Inter, system-ui, sans-serif;
+
+  /* Role aliases for the two stacks above. */
+  --font-heading: var(--font-display);
+  --font-hand: var(--font-script);
 }
 
 :root {
@@ -141,40 +295,4 @@ body {
   &::-webkit-scrollbar {
     display: none;
   }
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
- * Scroll-story landing page (src/views/LandingPage.jsx)
- * Kept from the `aarish` branch. Nothing here overrides a token above; these are
- * the extra names that page and its components (PublishSection, Icons, the
- * src/assets/images/*.webp crops) use. The page is not routed at the moment.
- * ───────────────────────────────────────────────────────────────────────────── */
-
-/* Pinned, scroll-scrubbed layout: from the laptop breakpoint up, motion allowed.
-   LandingPage.jsx uses the identical query in gsap.matchMedia(). */
-@custom-variant story (@media (width >= 1023px) and (prefers-reduced-motion: no-preference));
-
-@theme {
-  --color-sun: #f3cd5a;
-  --color-sun-soft: #f3e2a6;
-  --color-royal: #0157a9;
-  --color-mist: #f0f8fe;
-
-  --color-step-cyan: #befdff;
-  --color-step-pink: #ffd7fd;
-  --color-step-cream: #fff2c9;
-  --color-step-lilac: #dbcfff;
-
-  --color-cream-deep: #ffefca;
-  --color-ice: #e2effd;
-  --color-ice-deep: #bfdeff;
-
-  /* Named aliases for the default scale, added (not replacing it) so the
-     landing page's classes resolve while the team's sm/md/lg keep working. */
-  --breakpoint-tablet-sm: 640px;
-  --breakpoint-tablet: 767px;
-  --breakpoint-laptop-sm: 900px;
-  --breakpoint-laptop: 1023px;
-  --breakpoint-desktop-sm: 1280px;
-  --breakpoint-desktop: 1439px;
 }

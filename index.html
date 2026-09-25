@@ -11,11 +11,25 @@
     <meta name="author" content="Dev Team" />
     <meta name="theme-color" content="#deecfd" />
     <title>GSAP Motion Lab</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Fonts are self-hosted in public/fonts/ and declared in src/index.css.
+      Only the two faces used above the fold are preloaded: a font is otherwise
+      discovered late, once the CSS has parsed. Keep these paths in step with
+      the @font-face rules — a preload nothing uses is a wasted download.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,700&family=Gabarito:wght@500;600;700;800&family=Lexend:wght@400&family=Nunito:wght@800&family=Caveat:wght@500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/gabarito-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
   </head>
   <body>

@@ -12,7 +12,7 @@ const STATS = [
 
 const TONES = {
   cream: { card: "bg-cream", blob: "text-cream-deep" },
-  ice: { card: "bg-ice", blob: "text-ice-deep" },
+  ice: { card: "bg-frost", blob: "text-frost-deep" },
 };
 
 // No GSAP here. In the story layout this scene is a transparent full-frame layer whose white
@@ -22,7 +22,7 @@ export default function StatsSection() {
   return (
     <section className="scene scene-stats relative bg-white px-5 py-16 story:pointer-events-none story:absolute story:inset-0 story:z-20 story:bg-transparent story:p-0">
       <div className="story:pointer-events-auto story:absolute story:inset-x-0 story:top-[352px] story:bottom-0 story:bg-white">
-        <div className="mx-auto grid max-w-[1440px] gap-5 tablet-sm:grid-cols-2 laptop:grid-cols-4 story:gap-[24px] story:px-[15px] story:pt-[16px]">
+        <div className="mx-auto grid max-w-[1440px] gap-5 sm:grid-cols-2 lg:grid-cols-4 story:gap-[24px] story:px-[15px] story:pt-[16px]">
           {STATS.map((stat) => (
             <article
               key={stat.label}
